@@ -1,0 +1,142 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Admin | GlowCare</title>
+  <meta name="description" content="Admin panel - GlowCare frontend-only demo store.">
+  <link rel="stylesheet" href="css/style.css">
+  <link rel="stylesheet" href="css/navbar.css">
+  <link rel="stylesheet" href="css/admin.css">
+  <link rel="stylesheet" href="css/responsive.css">
+</head>
+<body data-require-auth="true" data-require-admin="true">
+  <div id="appNavbar"></div>
+
+  <main class="admin" id="adminPage">
+    <div class="container">
+      <div class="section__head section__head--split">
+        <div>
+          <h1 class="section__title">Admin</h1>
+          <p class="section__hint">Keyboard-only admin mode (Ctrl+Shift+A)</p>
+        </div>
+        <div style="display:flex; gap:10px; flex-wrap:wrap;">
+          <a class="btn btn--ghost" href="account.html">Account</a>
+          <button class="btn btn--ghost" type="button" id="logoutBtn">Logout</button>
+        </div>
+      </div>
+
+      <div class="admin__grid" style="margin-top:16px;">
+        <section class="panel">
+          <div class="title" style="font-size:18px;">Products</div>
+          <table class="table" style="margin-top:10px;">
+            <thead>
+              <tr>
+                <th>ID</th>
+                <th>Name</th>
+                <th>Brand</th>
+                <th>Category</th>
+                <th>Price</th>
+                <th>Actions</th>
+              </tr>
+            </thead>
+            <tbody id="adminProducts"></tbody>
+          </table>
+
+          <div class="title" style="font-size:18px; margin-top:16px;">Orders</div>
+          <table class="table" style="margin-top:10px;">
+            <thead>
+              <tr>
+                <th>Order</th>
+                <th>Date</th>
+                <th>User</th>
+                <th>Method</th>
+                <th>Total</th>
+                <th>Payment</th>
+                <th>Fulfillment</th>
+                <th>Actions</th>
+              </tr>
+            </thead>
+            <tbody id="adminOrders"></tbody>
+          </table>
+        </section>
+
+        <aside class="admin__side">
+          <div class="panel">
+            <div style="display:flex; justify-content:space-between; align-items:center; gap: 10px;">
+              <div class="title" style="font-size:18px;">Add / edit</div>
+              <button class="btn btn--ghost tiny" type="button" id="newBtn">New</button>
+            </div>
+            <form id="productForm" style="margin-top: 12px; display:grid; gap: 12px;">
+              <input class="input" id="pid" placeholder="ID (optional)">
+              <input class="input" id="name" placeholder="Name" required>
+              <input class="input" id="brand" placeholder="Brand" required>
+              <select class="select" id="category">
+                <option value="skincare">skincare</option>
+                <option value="hair">hair</option>
+                <option value="makeup">makeup</option>
+                <option value="fragrance">fragrance</option>
+              </select>
+              <input class="input" id="price" placeholder="Price" inputmode="numeric" required>
+            <input class="input" id="badge" placeholder="Badge (Bestseller/New)">
+            <textarea class="textarea" id="description" placeholder="Description"></textarea>
+            <input class="input" id="image" placeholder="Image path (assets/images/products/p1.svg)">
+            <div style="display:grid; grid-template-columns: 1fr 1fr; gap: 12px;">
+              <input class="input" id="variantSize" placeholder="Size (e.g. 150)" inputmode="numeric">
+              <select class="select" id="variantUnit" aria-label="Unit">
+                <option value="ml">ml</option>
+                <option value="g">g</option>
+              </select>
+            </div>
+            <button class="btn btn--primary btn--full" type="submit">Save</button>
+            <p class="help">Exit admin: Ctrl+Shift+U or Esc</p>
+          </form>
+          </div>
+
+          <div class="panel" style="margin-top:16px;" id="orderManagerPanel">
+            <div class="title" style="font-size:18px;">Order manager</div>
+            <p class="help" id="omHint" style="margin-top:6px;">Select an order from the table to manage status and generate bill.</p>
+
+            <div id="omWrap" hidden style="margin-top: 12px; display:grid; gap: 12px;">
+              <div style="display:flex; justify-content:space-between; align-items:center; gap: 10px; flex-wrap:wrap;">
+                <span class="tag" id="omOrderId">—</span>
+                <button class="btn btn--ghost tiny" type="button" id="omBill">Generate bill</button>
+              </div>
+
+              <div style="display:grid; grid-template-columns: 1fr 1fr; gap: 12px;">
+                <div class="field">
+                  <label class="label" for="omPayment">Payment</label>
+                  <select class="select" id="omPayment">
+                    <option value="paid">paid</option>
+                    <option value="unpaid">unpaid</option>
+                  </select>
+                </div>
+                <div class="field">
+                  <label class="label" for="omFulfillment">Fulfillment</label>
+                  <select class="select" id="omFulfillment">
+                    <option value="placed">placed</option>
+                    <option value="shipping">shipping</option>
+                    <option value="shipped">shipped</option>
+                    <option value="delivered">delivered</option>
+                    <option value="cancelled">cancelled</option>
+                  </select>
+                </div>
+              </div>
+
+              <button class="btn btn--primary btn--full" type="button" id="omSave">Save changes</button>
+
+              <div class="help" id="omShipTo"></div>
+              <div id="omItems" style="display:grid; gap: 8px;"></div>
+            </div>
+          </div>
+        </aside>
+      </div>
+    </div>
+  </main>
+
+  <div id="appFooter"></div>
+
+  <script src="js/main.js"></script>
+  <script src="js/admin.js"></script>
+</body>
+</html>

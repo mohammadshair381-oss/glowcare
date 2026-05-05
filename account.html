@@ -1,0 +1,69 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Account | GlowCare</title>
+  <meta name="description" content="Account - GlowCare frontend-only demo store.">
+  <link rel="stylesheet" href="css/style.css">
+  <link rel="stylesheet" href="css/navbar.css">
+  <link rel="stylesheet" href="css/account.css">
+  <link rel="stylesheet" href="css/responsive.css">
+</head>
+<body>
+  <div id="appNavbar"></div>
+
+  <main class="account" id="accountPage">
+    <div class="container">
+      <div class="section__head section__head--split">
+        <div>
+          <h1 class="section__title">Account</h1>
+          <p class="section__hint">Profile, orders, and activity</p>
+        </div>
+        <button class="btn btn--ghost" type="button" id="logoutBtn">Logout</button>
+      </div>
+
+      <div class="account__grid" style="margin-top:16px;">
+        <aside class="sidebar panel">
+          <div class="title" style="font-size:18px;">Profile</div>
+          <div style="margin-top:8px; display:grid; gap: 6px;">
+            <div><strong id="acctName">—</strong></div>
+            <div style="color: var(--sub); font-size: 13px;" id="acctEmail">—</div>
+            <div style="color: var(--sub); font-size: 13px;">Role: <strong id="acctRole">—</strong></div>
+          </div>
+
+          <div style="margin-top: 12px; display:grid; gap: 10px;">
+            <button class="sidebtn is-active" type="button" data-acct-tab="orders">Orders</button>
+            <button class="sidebtn" type="button" data-acct-tab="notifications">Notifications</button>
+            <button class="sidebtn" type="button" data-acct-tab="funnel">Funnel stats</button>
+            <div class="help">Admin mode: Ctrl+Shift+A (admin only)</div>
+          </div>
+        </aside>
+
+        <section class="cardlist">
+          <div data-acct-panel="orders">
+            <div class="title" style="font-size:18px;">Your orders</div>
+            <div id="ordersList" class="cardlist" style="margin-top: 12px;"></div>
+          </div>
+
+          <div data-acct-panel="notifications" hidden>
+            <div class="title" style="font-size:18px;">Notifications</div>
+            <div id="notifList" class="cardlist" style="margin-top: 12px;"></div>
+          </div>
+
+          <div data-acct-panel="funnel" hidden>
+            <div class="title" style="font-size:18px;">Activity</div>
+            <div id="funnelStats" class="cardlist" style="margin-top: 12px;"></div>
+          </div>
+        </section>
+      </div>
+    </div>
+  </main>
+
+  <div id="appFooter"></div>
+
+  <script src="js/main.js"></script>
+  <script src="js/account.js"></script>
+</body>
+</html>
+

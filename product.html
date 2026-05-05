@@ -1,0 +1,122 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Product | GlowCare</title>
+  <meta name="description" content="Product details for GlowCare beauty essentials. Frontend-only demo store.">
+  <link rel="stylesheet" href="css/style.css">
+  <link rel="stylesheet" href="css/navbar.css">
+  <link rel="stylesheet" href="css/animations.css">
+  <link rel="stylesheet" href="css/product.css">
+  <link rel="stylesheet" href="css/responsive.css">
+</head>
+<body>
+  <div id="appNavbar"></div>
+
+  <main class="product" id="productPage">
+    <div class="container">
+      <div class="breadcrumbs" aria-label="Breadcrumb">
+        <a href="index.html">Home</a>
+        <span aria-hidden="true">/</span>
+        <a href="shop.html">Shop</a>
+        <span aria-hidden="true">/</span>
+        <span id="bcName">Product</span>
+      </div>
+
+      <section class="product__grid" data-animate="fade-in">
+        <div class="product__media">
+          <img id="prodMainImg" alt="Product image">
+          <div class="thumbs" id="prodThumbs" aria-label="Gallery thumbnails"></div>
+        </div>
+
+        <div class="product__info">
+          <h1 class="product__title" id="prodName">Product</h1>
+          <p class="product__brand" id="prodBrand">—</p>
+          <p class="product__desc" id="prodDesc">—</p>
+
+          <div class="product__priceRow">
+            <div class="product__price" id="prodPrice">—</div>
+            <button class="btn btn--ghost tiny" type="button" id="wishBtn">Wishlist</button>
+          </div>
+
+          <div class="product__variants">
+            <div class="variant">
+              <div class="label">Shade</div>
+              <div class="segs" id="shadeWrap"></div>
+            </div>
+            <div class="variant">
+              <div class="label">Size</div>
+              <div class="segs" id="sizeWrap"></div>
+            </div>
+          </div>
+
+          <p class="help" id="stockMsg">—</p>
+
+          <div class="product__actions">
+            <div class="qty" aria-label="Quantity selector">
+              <button class="qty__btn" type="button" id="qtyMinus" aria-label="Decrease quantity">&#8722;</button>
+              <input class="qty__input" id="qty" inputmode="numeric" value="1" aria-label="Quantity">
+              <button class="qty__btn" type="button" id="qtyPlus" aria-label="Increase quantity">+</button>
+            </div>
+            <button class="btn btn--primary product__add" type="button" id="addBtn">Add to cart</button>
+          </div>
+
+          <div class="panel" style="margin-top:14px;">
+            <div class="title" style="font-size:16px;">Key ingredients</div>
+            <ul class="list" id="ingredientsList"></ul>
+          </div>
+
+          <div class="panel" style="margin-top:12px;">
+            <div class="title" style="font-size:16px;">How to use</div>
+            <p style="margin-top:8px;">Apply 2–3 drops on clean skin. Follow with moisturizer. For AM routines, finish with sunscreen.</p>
+          </div>
+        </div>
+      </section>
+
+      <section class="section section--muted" style="padding: 40px 0;">
+        <div class="container" style="padding: 0;">
+          <div class="section__head section__head--split">
+            <div>
+              <h2 class="section__title">Ratings &amp; reviews</h2>
+              <p class="section__hint">Customer feedback (mock UI)</p>
+            </div>
+          </div>
+
+          <div class="reviewsGrid">
+            <div class="panel">
+              <div class="ratingBox">
+                <div class="ratingBox__value" id="ratingValue">—</div>
+                <div class="ratingBox__stars" id="ratingStars">—</div>
+                <div class="ratingBox__count" id="ratingCount">—</div>
+              </div>
+              <div id="ratingBreakdown" class="bars"></div>
+            </div>
+            <div class="panel" id="reviews"></div>
+          </div>
+        </div>
+      </section>
+
+      <section class="section">
+        <div class="container" style="padding: 0;">
+          <div class="section__head section__head--split">
+            <div>
+              <h2 class="section__title">You may also like</h2>
+              <p class="section__hint">Similar picks for your routine</p>
+            </div>
+            <a class="btn btn--ghost" href="shop.html">Shop all</a>
+          </div>
+          <div class="products-grid" id="related" data-animate="fade-in"></div>
+        </div>
+      </section>
+    </div>
+  </main>
+
+  <div id="appFooter"></div>
+
+  <script src="js/main.js"></script>
+  <script src="js/animations.js"></script>
+  <script src="js/product.js"></script>
+</body>
+</html>
+

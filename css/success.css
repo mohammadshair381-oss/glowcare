@@ -1,0 +1,10 @@
+/* Success */
+.success { padding: 26px 0 80px; }
+.success__card { padding: 18px; text-align: center; }
+.success__icon { width: 64px; height: 64px; margin: 0 auto; border-radius: 999px; background: rgba(255, 46, 122, 0.10); border: 1px solid rgba(255, 46, 122, 0.18); display: grid; place-items: center; color: #b11651; font-weight: 950; }
+.success__title { margin-top: 14px; font-size: 26px; font-weight: 950; color: var(--text); }
+.success__sub { margin-top: 8px; }
+.order { margin-top: 14px; text-align: left; display: grid; gap: 8px; }
+.order__row { display: flex; justify-content: space-between; gap: 10px; color: var(--sub); font-size: 14px; }
+.order__row strong { color: var(--text); }
+

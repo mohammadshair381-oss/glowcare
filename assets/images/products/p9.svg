@@ -1,0 +1,21 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="640" height="640" viewBox="0 0 640 640" role="img" aria-label="Body Lotion">
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#fff6f0"/>
+      <stop offset="1" stop-color="#eef7ff"/>
+    </linearGradient>
+    <linearGradient id="b" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#ffb703"/>
+      <stop offset="1" stop-color="#2f80ff"/>
+    </linearGradient>
+  </defs>
+  <rect width="640" height="640" rx="44" fill="url(#bg)"/>
+  <g transform="translate(180 120)">
+    <rect x="70" y="0" width="140" height="90" rx="28" fill="#14151a"/>
+    <rect x="40" y="80" width="200" height="420" rx="64" fill="url(#b)"/>
+    <rect x="66" y="150" width="148" height="250" rx="32" fill="rgba(255,255,255,0.26)"/>
+    <text x="140" y="250" text-anchor="middle" font-family="system-ui,Segoe UI" font-weight="900" font-size="18" fill="#14151a">BODY</text>
+    <text x="140" y="278" text-anchor="middle" font-family="system-ui,Segoe UI" font-weight="750" font-size="14" fill="#14151a" opacity="0.78">Lotion</text>
+  </g>
+</svg>
+

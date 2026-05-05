@@ -1,0 +1,54 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Contact | GlowCare</title>
+  <meta name="description" content="Contact GlowCare - frontend-only demo store.">
+  <link rel="stylesheet" href="css/style.css">
+  <link rel="stylesheet" href="css/navbar.css">
+  <link rel="stylesheet" href="css/info-pages.css">
+  <link rel="stylesheet" href="css/responsive.css">
+</head>
+<body>
+  <div id="appNavbar"></div>
+
+  <main class="info">
+    <div class="container info__grid">
+      <section class="panel prose">
+        <h1 class="section__title">Contact</h1>
+        <p style="margin-top: 10px;">This is a demo contact form. Submissions are not sent to a server.</p>
+
+        <form id="contactForm" style="margin-top: 14px; display:grid; gap: 12px; max-width: 520px;">
+          <div class="field">
+            <label class="label" for="name">Name</label>
+            <input class="input" id="name" autocomplete="name" required>
+          </div>
+          <div class="field">
+            <label class="label" for="email">Email</label>
+            <input class="input" id="email" autocomplete="email" required>
+          </div>
+          <div class="field">
+            <label class="label" for="message">Message</label>
+            <textarea class="textarea" id="message" required></textarea>
+          </div>
+          <button class="btn btn--primary" type="submit">Send message</button>
+        </form>
+      </section>
+
+      <aside class="panel info__side">
+        <div class="title" style="font-size:18px;">Support</div>
+        <a href="mailto:support@glowcare.example">support@glowcare.example</a>
+        <a href="info.html#returns">Returns</a>
+        <a href="info.html#shipping">Shipping</a>
+      </aside>
+    </div>
+  </main>
+
+  <div id="appFooter"></div>
+
+  <script src="js/main.js"></script>
+  <script src="js/contact.js"></script>
+</body>
+</html>
+

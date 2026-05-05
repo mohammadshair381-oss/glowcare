@@ -1,0 +1,97 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Checkout (Shipping) | GlowCare</title>
+  <meta name="description" content="Shipping checkout - GlowCare frontend-only demo store.">
+  <link rel="stylesheet" href="css/style.css">
+  <link rel="stylesheet" href="css/navbar.css">
+  <link rel="stylesheet" href="css/checkout.css">
+  <link rel="stylesheet" href="css/responsive.css">
+</head>
+<body data-require-auth="true">
+  <div id="appNavbar"></div>
+
+  <main class="checkout" id="checkoutPage">
+    <div class="container">
+      <div class="section__head section__head--split">
+        <div>
+          <h1 class="section__title">Checkout</h1>
+          <p class="section__hint">Shipping details</p>
+        </div>
+        <a class="btn btn--ghost" href="cart.html">Back to cart</a>
+      </div>
+
+      <div class="checkout__grid" style="margin-top:16px;">
+        <section class="panel">
+          <div class="title" style="font-size:18px;">Shipping address</div>
+
+          <form id="shippingForm" class="formgrid" style="margin-top: 14px;">
+            <div class="field span2">
+              <label class="label" for="fullName">Full name</label>
+              <input class="input" id="fullName" autocomplete="name">
+              <div class="error" data-err="fullName"></div>
+            </div>
+
+            <div class="field">
+              <label class="label" for="phone">Phone</label>
+              <input class="input" id="phone" inputmode="tel" autocomplete="tel">
+              <div class="error" data-err="phone"></div>
+            </div>
+
+            <div class="field">
+              <label class="label" for="email">Email</label>
+              <input class="input" id="email" inputmode="email" autocomplete="email">
+              <div class="error" data-err="email"></div>
+            </div>
+
+            <div class="field">
+              <label class="label" for="pincode">Pincode</label>
+              <input class="input" id="pincode" inputmode="numeric" autocomplete="postal-code">
+              <div class="error" data-err="pincode"></div>
+            </div>
+
+            <div class="field span2">
+              <label class="label" for="address1">Address line 1</label>
+              <input class="input" id="address1" autocomplete="address-line1">
+              <div class="error" data-err="address1"></div>
+            </div>
+
+            <div class="field span2">
+              <label class="label" for="address2">Address line 2 (optional)</label>
+              <input class="input" id="address2" autocomplete="address-line2">
+              <div class="error" data-err="address2"></div>
+            </div>
+
+            <div class="field">
+              <label class="label" for="city">City</label>
+              <input class="input" id="city" autocomplete="address-level2">
+              <div class="error" data-err="city"></div>
+            </div>
+
+            <div class="field">
+              <label class="label" for="state">State</label>
+              <input class="input" id="state" autocomplete="address-level1">
+              <div class="error" data-err="state"></div>
+            </div>
+
+            <div class="span2" style="display:grid; gap:10px; margin-top: 8px;">
+              <button class="btn btn--primary btn--full" type="submit">Continue to payment</button>
+              <p class="help">No backend: shipping is saved locally as a draft.</p>
+            </div>
+          </form>
+        </section>
+
+        <aside id="checkoutSummary"></aside>
+      </div>
+    </div>
+  </main>
+
+  <div id="appFooter"></div>
+
+  <script src="js/main.js"></script>
+  <script src="js/checkout.js"></script>
+</body>
+</html>
+

@@ -1,0 +1,127 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>GlowCare | Premium Beauty Essentials</title>
+  <meta name="description" content="GlowCare - premium skincare & beauty essentials. Frontend-only demo store.">
+  <link rel="stylesheet" href="css/style.css">
+  <link rel="stylesheet" href="css/navbar.css">
+  <link rel="stylesheet" href="css/animations.css">
+  <link rel="stylesheet" href="css/homepage.css">
+  <link rel="stylesheet" href="css/responsive.css">
+</head>
+<body>
+  <div id="appNavbar"></div>
+
+  <main>
+    <section class="hero">
+      <div class="container hero__inner">
+        <div data-animate="rise-in">
+          <p class="pill">Clinically-inspired • Skin-friendly • Everyday essentials</p>
+          <h1>Glow that feels like skincare.</h1>
+          <p class="hero__sub">Build a routine that looks premium and feels effortless — sunscreens, barrier repair, and glow serums made for Indian weather.</p>
+          <div class="hero__cta">
+            <a class="btn btn--primary" href="shop.html">Shop all</a>
+            <a class="btn btn--ghost" href="shop.html?badge=Bestseller">Bestsellers</a>
+          </div>
+          <div class="hero__meta">
+            <div class="meta">
+              <span class="meta__title">Free shipping</span>
+              <span class="meta__desc">Above ₹499</span>
+            </div>
+            <div class="meta">
+              <span class="meta__title">Fast delivery</span>
+              <span class="meta__desc">2–5 business days</span>
+            </div>
+            <div class="meta">
+              <span class="meta__title">Easy returns</span>
+              <span class="meta__desc">Within 7 days</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="hero__visual" aria-hidden="true" data-animate="fade-in">
+          <div class="hero-card hero-card--a"></div>
+          <div class="hero-card hero-card--b"></div>
+          <div class="hero-card hero-card--c"></div>
+        </div>
+      </div>
+    </section>
+
+    <section class="section">
+      <div class="container">
+        <div class="section__head">
+          <div>
+            <h2 class="section__title">Shop by category</h2>
+            <p class="section__hint">Quick picks for your routine</p>
+          </div>
+          <a class="btn btn--ghost" href="shop.html">Explore</a>
+        </div>
+
+        <div class="chips" data-animate="fade-in">
+          <a class="chip" href="shop.html?category=skincare">Skincare</a>
+          <a class="chip" href="shop.html?category=hair">Hair</a>
+          <a class="chip" href="shop.html?category=makeup">Makeup</a>
+          <a class="chip" href="shop.html?category=fragrance">Fragrance</a>
+          <a class="chip" href="shop.html?concern=dullness">Dullness</a>
+          <a class="chip" href="shop.html?concern=barrier">Barrier</a>
+        </div>
+      </div>
+    </section>
+
+    <section class="section section--muted">
+      <div class="container">
+        <div class="section__head section__head--split">
+          <div>
+            <h2 class="section__title">Bestsellers</h2>
+            <p class="section__hint">Loved by customers — made for daily use</p>
+          </div>
+          <a class="btn btn--ghost" href="shop.html?badge=Bestseller">View all</a>
+        </div>
+
+        <div class="products-grid" id="homeBestsellers" data-animate="fade-in"></div>
+      </div>
+    </section>
+
+    <section class="offer" aria-label="Limited time offer">
+      <div class="container offer__inner">
+        <div>
+          <p class="kicker" style="color: rgba(255,255,255,0.78);">Limited time</p>
+          <h2 style="margin-top:6px; font-size:28px;">Buy 2 Get 2 Free</h2>
+          <p style="margin-top:8px; color: rgba(255,255,255,0.74);">Add any 2 products and get 2 minis free at checkout.</p>
+        </div>
+        <div class="offer__right">
+          <div class="countdown" aria-label="Offer countdown">
+            <div class="countdown__box"><span id="cdH">00</span><small>Hrs</small></div>
+            <div class="countdown__box"><span id="cdM">00</span><small>Min</small></div>
+            <div class="countdown__box"><span id="cdS">00</span><small>Sec</small></div>
+          </div>
+          <a class="btn btn--dark" href="shop.html">Shop now</a>
+        </div>
+      </div>
+    </section>
+
+    <section class="section">
+      <div class="container">
+        <div class="section__head section__head--split">
+          <div>
+            <h2 class="section__title">New arrivals</h2>
+            <p class="section__hint">Fresh launches to upgrade your routine</p>
+          </div>
+          <a class="btn btn--ghost" href="shop.html?badge=New">View all</a>
+        </div>
+
+        <div class="products-grid" id="homeNewArrivals" data-animate="fade-in"></div>
+      </div>
+    </section>
+  </main>
+
+  <div id="appFooter"></div>
+
+  <script src="js/main.js"></script>
+  <script src="js/animations.js"></script>
+  <script src="js/homepage.js"></script>
+</body>
+</html>
+

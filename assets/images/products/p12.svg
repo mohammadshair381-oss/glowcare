@@ -1,0 +1,21 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="640" height="640" viewBox="0 0 640 640" role="img" aria-label="Eau de Parfum">
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#fff2f7"/>
+      <stop offset="1" stop-color="#f8f7ff"/>
+    </linearGradient>
+    <linearGradient id="b" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#111827"/>
+      <stop offset="1" stop-color="#7c3aed"/>
+    </linearGradient>
+  </defs>
+  <rect width="640" height="640" rx="44" fill="url(#bg)"/>
+  <g transform="translate(180 150)">
+    <rect x="80" y="0" width="200" height="86" rx="28" fill="#14151a"/>
+    <rect x="60" y="76" width="240" height="310" rx="64" fill="url(#b)"/>
+    <rect x="88" y="126" width="184" height="200" rx="36" fill="rgba(255,255,255,0.18)"/>
+    <text x="180" y="230" text-anchor="middle" font-family="system-ui,Segoe UI" font-weight="900" font-size="18" fill="#fff">EAU</text>
+    <text x="180" y="258" text-anchor="middle" font-family="system-ui,Segoe UI" font-weight="750" font-size="14" fill="#fff" opacity="0.86">Parfum</text>
+  </g>
+</svg>
+

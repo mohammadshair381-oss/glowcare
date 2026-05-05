@@ -1,0 +1,49 @@
+<footer class="site-footer">
+  <div class="container footer__grid">
+    <div>
+      <a class="brand brand--footer" href="index.html" aria-label="GlowCare home">
+        <img class="brand__logo" src="assets/images/brand/logo.svg" alt="" aria-hidden="true">
+        <span class="brand__name">GlowCare</span>
+      </a>
+      <p class="footer__muted">Premium beauty essentials for everyday glow. Frontend-only demo storefront.</p>
+      <div class="footer__chips">
+        <span class="footchip">Dermat-tested</span>
+        <span class="footchip">Cruelty-free</span>
+        <span class="footchip">Made for India</span>
+      </div>
+    </div>
+
+    <div>
+      <h3 class="footer__title">Shop</h3>
+      <a class="footer__link" href="shop.html?category=skincare">Skincare</a>
+      <a class="footer__link" href="shop.html?category=hair">Hair</a>
+      <a class="footer__link" href="shop.html?category=makeup">Makeup</a>
+      <a class="footer__link" href="shop.html?category=fragrance">Fragrance</a>
+    </div>
+
+    <div>
+      <h3 class="footer__title">Help</h3>
+      <a class="footer__link" href="info.html#shipping">Shipping</a>
+      <a class="footer__link" href="info.html#returns">Returns</a>
+      <a class="footer__link" href="info.html#privacy">Privacy</a>
+      <a class="footer__link" href="info.html#terms">Terms</a>
+    </div>
+
+    <div>
+      <h3 class="footer__title">Contact</h3>
+      <a class="footer__link" href="mailto:support@glowcare.example">support@glowcare.example</a>
+      <p class="footer__muted">Monâ€“Sat, 10amâ€“6pm IST</p>
+      <div class="footer__social">
+        <a class="social" href="#" aria-label="Instagram">IG</a>
+        <a class="social" href="#" aria-label="YouTube">YT</a>
+        <a class="social" href="#" aria-label="X">X</a>
+      </div>
+    </div>
+  </div>
+
+  <div class="container footer__bottom">
+    <p class="footer__muted">Â© 2026 GlowCare</p>
+    <p class="footer__muted">Ctrl+Shift+A: admin mode (keyboard-only)</p>
+  </div>
+</footer>
+

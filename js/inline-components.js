@@ -1,0 +1,120 @@
+// Inline component fallback for file:// usage (no fetch allowed by browsers).
+// Keep this file in sync with `components/navbar.html` and `components/footer.html`.
+window.GlowCareInlineComponents = {
+  navbar: `<div class="navbar">
+  <div class="container navbar__row">
+    <button class="icon-btn navbar__menu" type="button" data-nav="menu" aria-label="Open menu" aria-expanded="false" aria-controls="mobileMenu">
+      <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M3 6h18M3 12h18M3 18h18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
+    </button>
+
+    <a class="brand" href="index.html" aria-label="GlowCare home">
+      <img class="brand__logo" src="assets/images/brand/logo.svg" alt="" aria-hidden="true">
+      <span class="brand__name">GlowCare</span>
+    </a>
+
+    <div class="nav-search" role="search">
+      <svg class="nav-search__icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M10.5 18a7.5 7.5 0 1 1 0-15 7.5 7.5 0 0 1 0 15Z" fill="none" stroke="currentColor" stroke-width="2"/><path d="M16 16l5 5" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
+      <input class="nav-search__input" id="navSearch" type="search" placeholder="Search glow serums, sunscreens..." autocomplete="off" aria-label="Search products">
+      <div class="nav-search__suggest" id="navSuggest" role="listbox" aria-label="Search suggestions" hidden></div>
+    </div>
+
+    <div class="navbar__actions">
+      <a class="btn btn--ghost navbar__login" id="navLoginBtn" href="login.html">Login</a>
+      <a class="icon-btn" href="wishlist.html" aria-label="Wishlist">
+        <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 21s-7-4.6-9.5-8.7C.6 9.2 2.2 6 5.6 6c1.9 0 3.3 1 4.4 2.3C11.1 7 12.5 6 14.4 6c3.4 0 5 3.2 3.1 6.3C19 16.4 12 21 12 21Z" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"/></svg>
+        <span class="badge" id="wishlistCount" aria-label="Wishlist items">0</span>
+      </a>
+      <a class="icon-btn" href="cart.html" aria-label="Cart">
+        <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 7h15l-2 9H8L6 7Z" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"/><path d="M6 7 5 3H2" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"/><path d="M9 21a1 1 0 1 0-1-1 1 1 0 0 0 1 1Zm10 0a1 1 0 1 0-1-1 1 1 0 0 0 1 1Z" fill="none" stroke="currentColor" stroke-width="2"/></svg>
+        <span class="badge" id="cartCount" aria-label="Cart items">0</span>
+      </a>
+      <a class="icon-btn" id="navAccountLink" href="account.html" aria-label="Account">
+        <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 12a4.5 4.5 0 1 0-4.5-4.5A4.5 4.5 0 0 0 12 12Z" fill="none" stroke="currentColor" stroke-width="2"/><path d="M4 21a8 8 0 0 1 16 0" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
+      </a>
+    </div>
+  </div>
+
+  <div class="navbar__links">
+    <div class="container navbar__linksRow">
+      <a class="navlink" href="shop.html?category=skincare">Skincare</a>
+      <a class="navlink" href="shop.html?category=hair">Hair</a>
+      <a class="navlink" href="shop.html?category=makeup">Makeup</a>
+      <a class="navlink" href="shop.html?category=fragrance">Fragrance</a>
+      <a class="navlink" href="about.html">About</a>
+      <a class="navlink" href="contact.html">Contact</a>
+      <a class="navlink navlink--pill" href="shop.html?badge=Bestseller">Bestsellers</a>
+    </div>
+  </div>
+</div>
+
+<div class="mobile-menu" id="mobileMenu" hidden>
+  <div class="mobile-menu__backdrop" data-nav="close"></div>
+  <div class="mobile-menu__panel" role="dialog" aria-modal="true" aria-label="Menu">
+    <div class="mobile-menu__top">
+      <span class="mobile-menu__title">Menu</span>
+      <button class="icon-btn" type="button" data-nav="close" aria-label="Close menu">
+        <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 6 18 18M18 6 6 18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
+      </button>
+    </div>
+    <a class="mobile-menu__link" href="shop.html">Shop all</a>
+    <a class="mobile-menu__link" href="shop.html?category=skincare">Skincare</a>
+    <a class="mobile-menu__link" href="shop.html?category=hair">Hair</a>
+    <a class="mobile-menu__link" href="shop.html?category=makeup">Makeup</a>
+    <a class="mobile-menu__link" href="shop.html?category=fragrance">Fragrance</a>
+    <a class="mobile-menu__link" href="wishlist.html">Wishlist</a>
+    <a class="mobile-menu__link" href="cart.html">Cart</a>
+    <a class="mobile-menu__link" id="mobileAccountLink" href="account.html">Account</a>
+    <a class="mobile-menu__link" href="about.html">About</a>
+    <a class="mobile-menu__link" href="contact.html">Contact</a>
+  </div>
+</div>`,
+  footer: `<footer class="site-footer">
+  <div class="container footer__grid">
+    <div>
+      <a class="brand brand--footer" href="index.html" aria-label="GlowCare home">
+        <img class="brand__logo" src="assets/images/brand/logo.svg" alt="" aria-hidden="true">
+        <span class="brand__name">GlowCare</span>
+      </a>
+      <p class="footer__muted">Premium beauty essentials for everyday glow. Frontend-only demo storefront.</p>
+      <div class="footer__chips">
+        <span class="footchip">Dermat-tested</span>
+        <span class="footchip">Cruelty-free</span>
+        <span class="footchip">Made for India</span>
+      </div>
+    </div>
+
+    <div>
+      <h3 class="footer__title">Shop</h3>
+      <a class="footer__link" href="shop.html?category=skincare">Skincare</a>
+      <a class="footer__link" href="shop.html?category=hair">Hair</a>
+      <a class="footer__link" href="shop.html?category=makeup">Makeup</a>
+      <a class="footer__link" href="shop.html?category=fragrance">Fragrance</a>
+    </div>
+
+    <div>
+      <h3 class="footer__title">Help</h3>
+      <a class="footer__link" href="info.html#shipping">Shipping</a>
+      <a class="footer__link" href="info.html#returns">Returns</a>
+      <a class="footer__link" href="info.html#privacy">Privacy</a>
+      <a class="footer__link" href="info.html#terms">Terms</a>
+    </div>
+
+    <div>
+      <h3 class="footer__title">Contact</h3>
+      <a class="footer__link" href="mailto:support@glowcare.example">support@glowcare.example</a>
+      <p class="footer__muted">Mon–Sat, 10am–6pm IST</p>
+      <div class="footer__social">
+        <a class="social" href="#" aria-label="Instagram">IG</a>
+        <a class="social" href="#" aria-label="YouTube">YT</a>
+        <a class="social" href="#" aria-label="X">X</a>
+      </div>
+    </div>
+  </div>
+
+  <div class="container footer__bottom">
+    <p class="footer__muted">© 2026 GlowCare</p>
+    <p class="footer__muted">Ctrl+Shift+A: admin mode (keyboard-only)</p>
+  </div>
+</footer>`,
+};
+

@@ -1,0 +1,49 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Forgot password | GlowCare</title>
+  <meta name="description" content="Reset password - GlowCare frontend-only demo store.">
+  <link rel="stylesheet" href="css/style.css">
+  <link rel="stylesheet" href="css/navbar.css">
+  <link rel="stylesheet" href="css/login.css">
+  <link rel="stylesheet" href="css/responsive.css">
+</head>
+<body>
+  <div id="appNavbar"></div>
+
+  <main class="auth" id="forgotPage">
+    <div class="container">
+      <div class="panel auth__wrap">
+        <h1 class="auth__title">Reset password</h1>
+        <p class="auth__sub">Frontend-only demo. Updates the local user password.</p>
+
+        <form id="forgotForm" class="auth__form">
+          <div class="field">
+            <label class="label" for="email">Email</label>
+            <input class="input" id="email" autocomplete="email">
+          </div>
+          <div class="field">
+            <label class="label" for="password">New password</label>
+            <input class="input" id="password" type="password" autocomplete="new-password">
+          </div>
+          <div class="error" id="forgotError"></div>
+          <button class="btn btn--primary btn--full" type="submit">Update password</button>
+        </form>
+
+        <div class="auth__links">
+          <a href="login.html">Back to login</a>
+          <a href="signup.html">Create account</a>
+        </div>
+      </div>
+    </div>
+  </main>
+
+  <div id="appFooter"></div>
+
+  <script src="js/main.js"></script>
+  <script src="js/forgot.js"></script>
+</body>
+</html>
+

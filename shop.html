@@ -1,0 +1,106 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Shop | GlowCare</title>
+  <meta name="description" content="Shop GlowCare products with filters, sort, and search. Frontend-only demo store.">
+  <link rel="stylesheet" href="css/style.css">
+  <link rel="stylesheet" href="css/navbar.css">
+  <link rel="stylesheet" href="css/animations.css">
+  <link rel="stylesheet" href="css/shop.css">
+  <link rel="stylesheet" href="css/responsive.css">
+</head>
+<body>
+  <div id="appNavbar"></div>
+
+  <main class="shop" id="shopPage">
+    <div class="container">
+      <div class="shop__grid">
+        <aside class="filters">
+          <div class="panel filters__card">
+            <div class="filters__title">Filters</div>
+
+            <div class="filters__group">
+              <label class="label" for="categorySelect">Category</label>
+              <select class="select" id="categorySelect">
+                <option value="">All</option>
+                <option value="skincare">Skincare</option>
+                <option value="hair">Hair</option>
+                <option value="makeup">Makeup</option>
+                <option value="fragrance">Fragrance</option>
+              </select>
+            </div>
+
+            <div class="filters__group">
+              <div class="label">Brand</div>
+              <label class="check"><input type="checkbox" name="brand" value="GlowCare"> GlowCare</label>
+              <label class="check"><input type="checkbox" name="brand" value="GlowCare Hair"> GlowCare Hair</label>
+              <label class="check"><input type="checkbox" name="brand" value="GlowCare Body"> GlowCare Body</label>
+              <label class="check"><input type="checkbox" name="brand" value="GlowCare Fragrance"> GlowCare Fragrance</label>
+            </div>
+
+            <div class="filters__group">
+              <div class="label">Skin type</div>
+              <label class="check"><input type="checkbox" name="skin" value="all"> All</label>
+              <label class="check"><input type="checkbox" name="skin" value="oily"> Oily</label>
+              <label class="check"><input type="checkbox" name="skin" value="combination"> Combination</label>
+              <label class="check"><input type="checkbox" name="skin" value="dry"> Dry</label>
+              <label class="check"><input type="checkbox" name="skin" value="sensitive"> Sensitive</label>
+            </div>
+
+            <div class="filters__group">
+              <div class="label">Concern</div>
+              <label class="check"><input type="checkbox" name="concern" value="dullness"> Dullness</label>
+              <label class="check"><input type="checkbox" name="concern" value="pigmentation"> Pigmentation</label>
+              <label class="check"><input type="checkbox" name="concern" value="barrier"> Barrier</label>
+              <label class="check"><input type="checkbox" name="concern" value="acne"> Acne</label>
+              <label class="check"><input type="checkbox" name="concern" value="pores"> Pores</label>
+              <label class="check"><input type="checkbox" name="concern" value="dryness"> Dryness</label>
+            </div>
+
+            <div class="filters__group">
+              <div class="label">Price</div>
+              <div style="display:grid; grid-template-columns: 1fr 1fr; gap: 10px;">
+                <input class="input" id="minPrice" placeholder="Min">
+                <input class="input" id="maxPrice" placeholder="Max">
+              </div>
+            </div>
+
+            <div style="margin-top: 12px; display:grid; gap: 10px;">
+              <button class="btn btn--ghost btn--full" id="clearFilters" type="button">Clear</button>
+            </div>
+          </div>
+        </aside>
+
+        <section>
+          <div class="shop__top">
+            <div>
+              <h1 class="title" style="font-size:26px;">Shop</h1>
+              <div class="shop__meta" id="shopMeta">—</div>
+            </div>
+            <div class="shop__searchRow">
+              <input class="input shop__search" id="shopQ" placeholder="Search products...">
+              <select class="select shop__sort" id="shopSort" aria-label="Sort">
+                <option value="popular">Sort: Popular</option>
+                <option value="rating">Sort: Rating</option>
+                <option value="price_asc">Sort: Price (low)</option>
+                <option value="price_desc">Sort: Price (high)</option>
+              </select>
+            </div>
+          </div>
+
+          <div class="products-grid rail" id="shopGrid" data-animate="fade-in"></div>
+        </section>
+      </div>
+    </div>
+  </main>
+
+  <div id="appFooter"></div>
+
+  <script src="js/main.js"></script>
+  <script src="js/animations.js"></script>
+  <script src="js/shop.js"></script>
+</body>
+</html>
+

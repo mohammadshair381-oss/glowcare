@@ -1,0 +1,21 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="640" height="640" viewBox="0 0 640 640" role="img" aria-label="Glow Mist Toner">
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#f8f7ff"/>
+      <stop offset="1" stop-color="#fff2f7"/>
+    </linearGradient>
+    <linearGradient id="b" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#7c3aed"/>
+      <stop offset="1" stop-color="#ff2e7a"/>
+    </linearGradient>
+  </defs>
+  <rect width="640" height="640" rx="44" fill="url(#bg)"/>
+  <g transform="translate(225 90)">
+    <rect x="35" y="0" width="130" height="86" rx="24" fill="#14151a"/>
+    <rect x="30" y="78" width="140" height="380" rx="50" fill="url(#b)"/>
+    <rect x="46" y="130" width="108" height="240" rx="28" fill="rgba(255,255,255,0.26)"/>
+    <text x="100" y="230" text-anchor="middle" font-family="system-ui,Segoe UI" font-weight="900" font-size="18" fill="#14151a">MIST</text>
+    <text x="100" y="258" text-anchor="middle" font-family="system-ui,Segoe UI" font-weight="750" font-size="14" fill="#14151a" opacity="0.78">Toner</text>
+  </g>
+</svg>
+

@@ -1,0 +1,50 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Login | GlowCare</title>
+  <meta name="description" content="Login - GlowCare frontend-only demo store.">
+  <link rel="stylesheet" href="css/style.css">
+  <link rel="stylesheet" href="css/navbar.css">
+  <link rel="stylesheet" href="css/login.css">
+  <link rel="stylesheet" href="css/responsive.css">
+</head>
+<body>
+  <div id="appNavbar"></div>
+
+  <main class="auth" id="loginPage">
+    <div class="container">
+      <div class="panel auth__wrap">
+        <h1 class="auth__title">Welcome back</h1>
+        <p class="auth__sub">Use demo: <strong>demo@glowcare.example</strong> / <strong>demo123</strong></p>
+        <p class="auth__sub">Admin: <strong>admin@glowcare.example</strong> / <strong>admin123</strong></p>
+
+        <form id="loginForm" class="auth__form">
+          <div class="field">
+            <label class="label" for="email">Email</label>
+            <input class="input" id="email" autocomplete="email">
+          </div>
+          <div class="field">
+            <label class="label" for="password">Password</label>
+            <input class="input" id="password" type="password" autocomplete="current-password">
+          </div>
+          <div class="error" id="loginError"></div>
+          <button class="btn btn--primary btn--full" type="submit">Login</button>
+        </form>
+
+        <div class="auth__links">
+          <a href="forgot.html">Forgot password?</a>
+          <a href="signup.html">Create account</a>
+        </div>
+      </div>
+    </div>
+  </main>
+
+  <div id="appFooter"></div>
+
+  <script src="js/main.js"></script>
+  <script src="js/login.js"></script>
+</body>
+</html>
+
