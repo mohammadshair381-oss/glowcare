@@ -1,0 +1,52 @@
+{% extends "dashboard/base.html" %}
+{% block title %}Homepage Builder — GlowCare CMS{% endblock %}
+{% block header %}Homepage Builder{% endblock %}
+{% block subheader %}Drag & drop section order, toggle visibility{% endblock %}
+
+{% block content %}
+  <section class="dpanel">
+    <div class="dpanel__head">
+      <div>
+        <div class="dpanel__title">Section Order</div>
+        <div class="dpanel__sub">This controls the exact homepage flow</div>
+      </div>
+      <div class="dpanel__actions">
+        <button class="dbtn dbtn--primary" type="button" data-save-sections>Save changes</button>
+      </div>
+    </div>
+
+    <form id="sectionsForm" class="dlist" method="post" action="{% url 'dashboard:homepage_sections_order' %}">
+      {% csrf_token %}
+      <div class="dlist__hint">Tip: drag handle to reorder</div>
+      <div class="ditems" id="sectionsSortable" data-sortable>
+        {% for s in sections %}
+          <div class="ditem" data-id="{{ s.section_id }}">
+            <span class="dhandle" aria-hidden="true">⋮⋮</span>
+            <div class="ditem__main">
+              <div class="ditem__title">{{ s.section_id }}</div>
+              <div class="ditem__sub">Enabled: {{ s.enabled }}</div>
+            </div>
+            <label class="dtoggle">
+              <input type="checkbox" {% if s.enabled %}checked{% endif %} data-enabled="{{ s.section_id }}">
+              <span></span>
+            </label>
+          </div>
+        {% endfor %}
+      </div>
+    </form>
+  </section>
+
+  <section class="dpanel">
+    <div class="dpanel__head">
+      <div>
+        <div class="dpanel__title">Live Preview</div>
+        <div class="dpanel__sub">Open the homepage in a new tab</div>
+      </div>
+      <div class="dpanel__actions">
+        <a class="dbtn" href="/" target="_blank" rel="noreferrer">Open preview</a>
+      </div>
+    </div>
+    <div class="dmuted">Preview reflects saved CMS changes immediately on refresh.</div>
+  </section>
+{% endblock %}
+

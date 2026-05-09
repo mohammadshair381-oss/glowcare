@@ -1,0 +1,40 @@
+{% extends "dashboard/base.html" %}
+{% block title %}Featured Logos — GlowCare CMS{% endblock %}
+{% block header %}Featured Logos{% endblock %}
+{% block subheader %}Manage “Featured In” logos and ordering{% endblock %}
+
+{% block content %}
+  <section class="dpanel">
+    <div class="dpanel__head">
+      <div>
+        <div class="dpanel__title">Logos</div>
+        <div class="dpanel__sub">Add/edit logo name + linked media</div>
+      </div>
+      <div class="dpanel__actions">
+        <form method="post">{% csrf_token %}<button class="dbtn dbtn--primary" type="submit">+ New</button></form>
+      </div>
+    </div>
+
+    <div class="dtable">
+      <div class="dthead" style="grid-template-columns: 1fr 2fr 1fr 1fr 1fr;">
+        <div>Order</div>
+        <div>Name</div>
+        <div>Media</div>
+        <div>Status</div>
+        <div></div>
+      </div>
+      {% for l in items %}
+        <div class="drow" style="grid-template-columns: 1fr 2fr 1fr 1fr 1fr;">
+          <div>{{ l.sort_order }}</div>
+          <div>{{ l.name }}</div>
+          <div>{% if l.logo_id %}#{{ l.logo_id }}{% else %}—{% endif %}</div>
+          <div>{% if l.enabled %}<span class="dpill dpill--ok">Enabled</span>{% else %}<span class="dpill">Disabled</span>{% endif %}</div>
+          <div><a class="dbtn" href="{% url 'dashboard:logo_edit' l.id %}">Edit</a></div>
+        </div>
+      {% empty %}
+        <div class="dmuted">No logos yet.</div>
+      {% endfor %}
+    </div>
+  </section>
+{% endblock %}
+

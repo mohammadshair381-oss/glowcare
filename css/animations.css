@@ -1,7 +1,21 @@
 /* Subtle motion only */
 .fade-in { animation: fadeIn 420ms var(--ease) both; }
 .rise-in { animation: riseIn 520ms var(--ease) both; }
+.float-in { animation: floatIn 560ms var(--ease) both; }
+.pop { animation: pop 260ms var(--ease) both; }
+.shine { position: relative; overflow: hidden; }
+.shine::after {
+  content: "";
+  position: absolute;
+  inset: -40% -60%;
+  transform: translateX(-120%) rotate(18deg);
+  background: linear-gradient(90deg, rgba(255,255,255,0), rgba(255,255,255,0.55), rgba(255,255,255,0));
+  opacity: 0.9;
+}
+.shine:hover::after { animation: shine 900ms var(--ease); }
 
 @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
 @keyframes riseIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
-
+@keyframes floatIn { from { opacity: 0; transform: translateY(12px) scale(0.98); } to { opacity: 1; transform: translateY(0) scale(1); } }
+@keyframes pop { from { transform: scale(0.96); } to { transform: scale(1); } }
+@keyframes shine { to { transform: translateX(120%) rotate(18deg); } }

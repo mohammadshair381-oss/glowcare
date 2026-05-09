@@ -1,0 +1,31 @@
+{% extends "dashboard/base.html" %}
+{% block title %}App Banner — GlowCare CMS{% endblock %}
+{% block header %}App Banner{% endblock %}
+{% block subheader %}Edit the “Download app now” section{% endblock %}
+
+{% block content %}
+  <section class="dpanel">
+    <div class="dpanel__head">
+      <div>
+        <div class="dpanel__title">App banner</div>
+        <div class="dpanel__sub">Edit title/subtitle/stores JSON and background</div>
+      </div>
+      <div class="dpanel__actions">
+        <a class="dbtn" href="/" target="_blank" rel="noreferrer">Preview</a>
+      </div>
+    </div>
+
+    <form method="post" class="dform2" style="margin-top:12px;">
+      {% csrf_token %}
+      <div class="drow2"><label class="dlabel">Enabled</label>{{ form.enabled }}</div>
+      <div class="drow2"><label class="dlabel">Title</label>{{ form.title }}</div>
+      <div class="drow2"><label class="dlabel">Subtitle</label>{{ form.subtitle }}</div>
+      <div class="drow2"><label class="dlabel">Background (CSS)</label>{{ form.bg }}</div>
+      <div class="drow2"><label class="dlabel">Stores JSON</label>{{ form.stores_json }}<div class="dhelp">{{ form.stores_json.help_text }}</div></div>
+      <div class="dactions2">
+        <button class="dbtn dbtn--primary" type="submit">Save</button>
+      </div>
+    </form>
+  </section>
+{% endblock %}
+

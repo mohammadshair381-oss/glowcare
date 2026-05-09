@@ -1,0 +1,44 @@
+{% extends "dashboard/base.html" %}
+{% block title %}Dashboard â€” GlowCare CMS{% endblock %}
+{% block header %}Dashboard{% endblock %}
+{% block subheader %}Content, products & homepage controls{% endblock %}
+
+{% block content %}
+  <section class="dgrid">
+    <div class="dstat">
+      <div class="dstat__k">Products</div>
+      <div class="dstat__v">{{ counts.products }}</div>
+      <div class="dstat__s">Catalog items</div>
+    </div>
+    <div class="dstat">
+      <div class="dstat__k">Hero slides</div>
+      <div class="dstat__v">{{ counts.hero_slides }}</div>
+      <div class="dstat__s">Homepage carousel</div>
+    </div>
+    <div class="dstat">
+      <div class="dstat__k">Sections</div>
+      <div class="dstat__v">{{ counts.sections }}</div>
+      <div class="dstat__s">Order + visibility</div>
+    </div>
+  </section>
+
+  <section class="dpanel">
+    <div class="dpanel__head">
+      <div>
+        <div class="dpanel__title">Quick actions</div>
+        <div class="dpanel__sub">Most-used CMS areas</div>
+      </div>
+    </div>
+    <div class="dactions">
+      <a class="daction" href="{% url 'dashboard:homepage_builder' %}">Homepage builder</a>
+      <a class="daction" href="{% url 'dashboard:homepage_editor' %}">Visual editor</a>
+      <a class="daction" href="{% url 'dashboard:hero_slides' %}">Hero slides</a>
+      <a class="daction" href="{% url 'dashboard:products' %}">Products</a>
+      <a class="daction" href="{% url 'dashboard:media' %}">Media library</a>
+      <a class="daction" href="{% url 'dashboard:navigation' %}">Navbar</a>
+      <a class="daction" href="{% url 'dashboard:footer' %}">Footer</a>
+      <a class="daction" href="{% url 'dashboard:theme' %}">Theme</a>
+      <a class="daction" href="{% url 'dashboard:announcement' %}">Announcement</a>
+    </div>
+  </section>
+{% endblock %}

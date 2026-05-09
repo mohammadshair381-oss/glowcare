@@ -1,0 +1,38 @@
+{% extends "dashboard/base.html" %}
+{% block title %}Product Sections — GlowCare CMS{% endblock %}
+{% block header %}Product Sections{% endblock %}
+{% block subheader %}Edit tabs/filters driving homepage product rails{% endblock %}
+
+{% block content %}
+  <section class="dpanel">
+    <div class="dpanel__head">
+      <div>
+        <div class="dpanel__title">Homepage rails</div>
+        <div class="dpanel__sub">Bestsellers, New Arrivals, Skin Concerns (tabs + filters)</div>
+      </div>
+      <div class="dpanel__actions">
+        <a class="dbtn" href="/" target="_blank" rel="noreferrer">Preview</a>
+      </div>
+    </div>
+
+    <div class="dtable">
+      <div class="dthead" style="grid-template-columns: 1.2fr 2fr 1fr 1fr;">
+        <div>Kind</div>
+        <div>Title</div>
+        <div>Status</div>
+        <div></div>
+      </div>
+      {% for s in items %}
+        <div class="drow" style="grid-template-columns: 1.2fr 2fr 1fr 1fr;">
+          <div>{{ s.kind }}</div>
+          <div>{{ s.title }}</div>
+          <div>{% if s.enabled %}<span class="dpill dpill--ok">Enabled</span>{% else %}<span class="dpill">Disabled</span>{% endif %}</div>
+          <div><a class="dbtn" href="{% url 'dashboard:product_section_edit' s.kind %}">Edit</a></div>
+        </div>
+      {% empty %}
+        <div class="dmuted">No product sections configured. Run `seed_demo` or create via Django admin.</div>
+      {% endfor %}
+    </div>
+  </section>
+{% endblock %}
+

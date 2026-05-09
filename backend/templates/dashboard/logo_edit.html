@@ -1,0 +1,45 @@
+{% extends "dashboard/base.html" %}
+{% block title %}Edit Logo — GlowCare CMS{% endblock %}
+{% block header %}Edit Featured Logo{% endblock %}
+{% block subheader %}Name, order, enable and media id{% endblock %}
+
+{% block content %}
+  <section class="dpanel">
+    <div class="dpanel__head">
+      <div>
+        <div class="dpanel__title">{{ l.name }}</div>
+        <div class="dpanel__sub">Saved changes update homepage via API</div>
+      </div>
+      <div class="dpanel__actions">
+        <a class="dbtn" href="{% url 'dashboard:logos' %}">Back</a>
+      </div>
+    </div>
+
+    <form method="post" class="dform2" style="margin-top:12px;">
+      {% csrf_token %}
+      <div class="dgrid2">
+        <div class="drow2"><label class="dlabel">Enabled</label><input type="checkbox" name="enabled" value="1" {% if l.enabled %}checked{% endif %}></div>
+        <div class="drow2"><label class="dlabel">Order</label><input class="dinput" name="sort_order" value="{{ l.sort_order }}"></div>
+      </div>
+      <div class="drow2"><label class="dlabel">Name</label><input class="dinput" name="name" value="{{ l.name }}"></div>
+      <div class="drow2"><label class="dlabel">Logo media asset id</label><input class="dinput" name="logo_id" value="{% if l.logo_id %}{{ l.logo_id }}{% endif %}"></div>
+      <div class="dactions2"><button class="dbtn dbtn--primary" type="submit">Save</button></div>
+    </form>
+    <form method="post" action="{% url 'dashboard:logo_delete' l.id %}" onsubmit="return confirm('Delete this logo?')" style="margin-top:10px;">
+      {% csrf_token %}
+      <button class="dbtn" type="submit">Delete</button>
+    </form>
+  </section>
+
+  <section class="dpanel">
+    <div class="dpanel__head"><div><div class="dpanel__title">Quick media picker</div><div class="dpanel__sub">Copy an id into Logo field</div></div></div>
+    <div style="margin-top:12px; display:grid; grid-template-columns: repeat(6, minmax(0,1fr)); gap: 10px;">
+      {% for a in assets %}
+        <div style="border:1px solid rgba(255,255,255,.10); border-radius: 18px; overflow:hidden; background: rgba(0,0,0,.16); padding:10px;">
+          <div style="font-weight:900; font-size:12px;">#{{ a.id }} — {{ a.title|default:"Asset" }}</div>
+          <div class="dhelp" style="margin-top:6px; word-break: break-all;">{{ a.file.url }}</div>
+        </div>
+      {% endfor %}
+    </div>
+  </section>
+{% endblock %}

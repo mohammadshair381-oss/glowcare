@@ -1,0 +1,62 @@
+{% extends "dashboard/base.html" %}
+{% block title %}Navbar Editor — GlowCare CMS{% endblock %}
+{% block header %}Navbar Editor{% endblock %}
+{% block subheader %}Add/remove nav links (API-driven){% endblock %}
+
+{% block content %}
+  <section class="dpanel">
+    <div class="dpanel__head">
+      <div>
+        <div class="dpanel__title">{{ menu.name }}</div>
+        <div class="dpanel__sub">Links are served to frontend via `/api/v1/homepage/`</div>
+      </div>
+      <div class="dpanel__actions">
+        <a class="dbtn" href="/" target="_blank" rel="noreferrer">Preview</a>
+      </div>
+    </div>
+
+    <form method="post" style="margin-top:12px; display:grid; grid-template-columns: 1fr 1fr .6fr .4fr; gap: 10px;">
+      {% csrf_token %}
+      <input class="dinput" name="label" placeholder="Label">
+      <input class="dinput" name="href" placeholder="Href (e.g. shop.html?badge=Bestseller)">
+      <select class="dinput" name="is_pill">
+        <option value="0">Normal</option>
+        <option value="1">Pill</option>
+      </select>
+      <button class="dbtn dbtn--primary" type="submit">Add</button>
+    </form>
+
+    <div style="display:flex; justify-content:space-between; align-items:center; gap: 10px; margin-top: 14px;">
+      <div class="dpanel__sub">Drag to reorder. Toggle enable. Mark delete then save.</div>
+      <button class="dbtn" type="button" data-save-nav>Save menu</button>
+    </div>
+
+    <form id="navOrderForm" action="{% url 'dashboard:navigation_order' %}" method="post" style="margin-top:12px;">
+      {% csrf_token %}
+      <div class="ditems" id="navSortable" data-sortable>
+        {% for l in links %}
+          <div class="ditem" data-id="{{ l.id }}">
+            <span class="dhandle" aria-hidden="true">⋮⋮</span>
+            <div class="ditem__main">
+              <div class="ditem__title">{{ l.label }}</div>
+              <div class="ditem__sub" style="word-break: break-all;">{{ l.href }}</div>
+              <div style="margin-top:6px; display:flex; gap: 10px; flex-wrap:wrap;">
+                {% if l.is_pill %}<span class="dpill dpill--ok">Pill</span>{% else %}<span class="dpill">Normal</span>{% endif %}
+              </div>
+            </div>
+            <label class="dtoggle">
+              <input type="checkbox" {% if l.is_enabled %}checked{% endif %} data-enabled="{{ l.id }}">
+              <span></span>
+            </label>
+            <label style="display:flex; align-items:center; gap: 8px; color: var(--d-sub); font-size: 12px;">
+              <input type="checkbox" data-delete="{{ l.id }}">
+              Delete
+            </label>
+          </div>
+        {% empty %}
+          <div class="dmuted">No links yet.</div>
+        {% endfor %}
+      </div>
+    </form>
+  </section>
+{% endblock %}

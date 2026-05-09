@@ -1,0 +1,56 @@
+{% extends "dashboard/base.html" %}
+{% block title %}Edit Testimonial — GlowCare CMS{% endblock %}
+{% block header %}Edit Testimonial{% endblock %}
+{% block subheader %}Update text, rating, avatar and visibility{% endblock %}
+
+{% block content %}
+  <section class="dpanel">
+    <div class="dpanel__head">
+      <div>
+        <div class="dpanel__title">{{ t.name }}</div>
+        <div class="dpanel__sub">Saved changes update homepage carousel via API</div>
+      </div>
+      <div class="dpanel__actions">
+        <a class="dbtn" href="{% url 'dashboard:testimonials' %}">Back</a>
+      </div>
+    </div>
+
+    <form method="post" class="dform2" style="margin-top:12px;">
+      {% csrf_token %}
+      <div class="dgrid2">
+        <div class="drow2"><label class="dlabel">Enabled</label><input type="checkbox" name="enabled" value="1" {% if t.enabled %}checked{% endif %}></div>
+        <div class="drow2"><label class="dlabel">Order</label><input class="dinput" name="sort_order" value="{{ t.sort_order }}"></div>
+      </div>
+      <div class="drow2"><label class="dlabel">Name</label><input class="dinput" name="name" value="{{ t.name }}"></div>
+      <div class="drow2"><label class="dlabel">Meta</label><input class="dinput" name="meta" value="{{ t.meta }}"></div>
+      <div class="drow2"><label class="dlabel">Rating</label><input class="dinput" name="rating" value="{{ t.rating }}"></div>
+      <div class="drow2"><label class="dlabel">Text</label><textarea class="dinput" name="text" rows="4">{{ t.text }}</textarea></div>
+      <div class="drow2">
+        <label class="dlabel">Avatar (MediaAsset id)</label>
+        <input class="dinput" name="avatar_id" value="{% if t.avatar_id %}{{ t.avatar_id }}{% endif %}">
+        <div class="dhelp">Pick from Media Library or below list.</div>
+      </div>
+      <div class="dactions2">
+        <button class="dbtn dbtn--primary" type="submit">Save</button>
+        <form method="post" action="{% url 'dashboard:testimonial_delete' t.id %}" onsubmit="return confirm('Delete this testimonial?')" style="display:inline;">
+          {% csrf_token %}
+          <button class="dbtn" type="submit">Delete</button>
+        </form>
+      </div>
+    </form>
+  </section>
+
+  <section class="dpanel">
+    <div class="dpanel__head">
+      <div><div class="dpanel__title">Quick media picker</div><div class="dpanel__sub">Copy an id into Avatar field</div></div>
+    </div>
+    <div style="margin-top:12px; display:grid; grid-template-columns: repeat(6, minmax(0,1fr)); gap: 10px;">
+      {% for a in assets %}
+        <div style="border:1px solid rgba(255,255,255,.10); border-radius: 18px; overflow:hidden; background: rgba(0,0,0,.16); padding:10px;">
+          <div style="font-weight:900; font-size:12px;">#{{ a.id }} — {{ a.title|default:"Asset" }}</div>
+          <div class="dhelp" style="margin-top:6px; word-break: break-all;">{{ a.file.url }}</div>
+        </div>
+      {% endfor %}
+    </div>
+  </section>
+{% endblock %}

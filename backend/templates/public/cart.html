@@ -1,0 +1,40 @@
+{% load static %}
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Cart | GlowCare</title>
+  <meta name="description" content="Cart - GlowCare frontend-only demo store.">
+  <meta name="gc-static-base" content="{% static '' %}">
+  <link rel="stylesheet" href="{% static 'css/style.css' %}">
+  <link rel="stylesheet" href="{% static 'css/navbar.css' %}">
+  <link rel="stylesheet" href="{% static 'css/cart.css' %}">
+  <link rel="stylesheet" href="{% static 'css/responsive.css' %}">
+</head>
+<body>
+  <div id="appNavbar"></div>
+
+  <main class="cart" id="cartPage">
+    <div class="container">
+      <div class="section__head section__head--split">
+        <div>
+          <h1 class="section__title">Your cart</h1>
+          <p class="section__hint">Review items before checkout</p>
+        </div>
+        <a class="btn btn--ghost" href="shop.html">Continue shopping</a>
+      </div>
+
+      <div class="cart__grid" style="margin-top: 16px;">
+        <section id="cartItems" class="cardlist"></section>
+        <aside id="cartSummary"></aside>
+      </div>
+    </div>
+  </main>
+
+  <div id="appFooter"></div>
+
+  <script src="{% static 'js/main.js' %}"></script>
+  <script src="{% static 'js/cart.js' %}"></script>
+</body>
+</html>

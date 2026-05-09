@@ -1,0 +1,45 @@
+{% extends "dashboard/base.html" %}
+{% block title %}Hero Slides — GlowCare CMS{% endblock %}
+{% block header %}Hero Slides{% endblock %}
+{% block subheader %}Add / edit / reorder homepage hero carousel{% endblock %}
+
+{% block content %}
+  <section class="dpanel">
+    <div class="dpanel__head">
+      <div>
+        <div class="dpanel__title">Slides</div>
+        <div class="dpanel__sub">Create and edit hero slides (images can be linked from Media Library)</div>
+      </div>
+      <div class="dpanel__actions">
+        <button class="dbtn" type="button" data-save-hero>Save order</button>
+        <form method="post">
+          {% csrf_token %}
+          <button class="dbtn dbtn--primary" type="submit">+ New slide</button>
+        </form>
+      </div>
+    </div>
+
+    <form id="heroOrderForm" action="{% url 'dashboard:hero_slides_order' %}" method="post" style="margin-top:12px;">
+      {% csrf_token %}
+      <div class="dlist__hint">Drag to reorder. Toggle to enable/disable.</div>
+      <div class="ditems" id="heroSortable" data-sortable>
+        {% for s in slides %}
+          <div class="ditem" data-id="{{ s.id }}">
+            <span class="dhandle" aria-hidden="true">⋮⋮</span>
+            <div class="ditem__main">
+              <div class="ditem__title">#{{ s.id }} — {{ s.headline }} {{ s.headline2 }}</div>
+              <div class="ditem__sub">Order: {{ s.sort_order }}</div>
+            </div>
+            <label class="dtoggle">
+              <input type="checkbox" {% if s.enabled %}checked{% endif %} data-enabled="{{ s.id }}">
+              <span></span>
+            </label>
+            <a class="dbtn" href="{% url 'dashboard:hero_slide_edit' s.id %}">Edit</a>
+          </div>
+        {% empty %}
+          <div class="dmuted">No slides yet. Create one.</div>
+        {% endfor %}
+      </div>
+    </form>
+  </section>
+{% endblock %}

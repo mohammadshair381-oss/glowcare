@@ -1,0 +1,91 @@
+{% extends "dashboard/base.html" %}
+{% block title %}Edit Slide — GlowCare CMS{% endblock %}
+{% block header %}Edit Hero Slide{% endblock %}
+{% block subheader %}Upload media, edit text, ribbons/meta, overlay and button styles{% endblock %}
+
+{% block content %}
+  <section class="dpanel">
+    <div class="dpanel__head">
+      <div>
+        <div class="dpanel__title">Slide #{{ slide.id }}</div>
+        <div class="dpanel__sub">Save → refresh homepage preview (or use Visual Editor split view)</div>
+      </div>
+      <div class="dpanel__actions">
+        <a class="dbtn" href="{% url 'dashboard:hero_slides' %}">Back</a>
+      </div>
+    </div>
+
+    <form method="post" class="dform2" enctype="multipart/form-data" style="margin-top:12px;">
+      {% csrf_token %}
+
+      <div class="dgrid2">
+        <div class="drow2"><label class="dlabel">Enabled</label>{{ form.enabled }}</div>
+        <div class="drow2"><label class="dlabel">Sort order</label>{{ form.sort_order }}</div>
+      </div>
+
+      <div class="drow2"><label class="dlabel">Kicker</label>{{ form.kicker }}</div>
+      <div class="dgrid2">
+        <div class="drow2"><label class="dlabel">Headline</label>{{ form.headline }}</div>
+        <div class="drow2"><label class="dlabel">Headline 2 (accent)</label>{{ form.headline2 }}</div>
+      </div>
+      <div class="drow2"><label class="dlabel">Sub text</label>{{ form.sub }}</div>
+
+      <div class="dgrid2">
+        <div class="drow2"><label class="dlabel">Primary label</label>{{ form.primary_label }}</div>
+        <div class="drow2"><label class="dlabel">Primary href</label>{{ form.primary_href }}</div>
+      </div>
+      <div class="dgrid2">
+        <div class="drow2"><label class="dlabel">Secondary label</label>{{ form.secondary_label }}</div>
+        <div class="drow2"><label class="dlabel">Secondary href</label>{{ form.secondary_href }}</div>
+      </div>
+
+      <div class="drow2">
+        <label class="dlabel">Overlay background (CSS)</label>
+        {{ form.overlay_bg }}
+        <div class="dhelp">Example: radial-gradient(...), linear-gradient(...)</div>
+      </div>
+
+      <div class="dpanel__sub" style="margin-top:8px;">Media (select existing or upload new)</div>
+      <div class="dgrid2">
+        <div class="drow2"><label class="dlabel">Background (select)</label>{{ form.background }}</div>
+        <div class="drow2"><label class="dlabel">Background (upload)</label>{{ form.background_upload }}</div>
+      </div>
+      <div class="dgrid2">
+        <div class="drow2"><label class="dlabel">Card A (select)</label>{{ form.card_a }}</div>
+        <div class="drow2"><label class="dlabel">Card A (upload)</label>{{ form.card_a_upload }}</div>
+      </div>
+      <div class="dgrid2">
+        <div class="drow2"><label class="dlabel">Card B (select)</label>{{ form.card_b }}</div>
+        <div class="drow2"><label class="dlabel">Card B (upload)</label>{{ form.card_b_upload }}</div>
+      </div>
+      <div class="dgrid2">
+        <div class="drow2"><label class="dlabel">Card C (select)</label>{{ form.card_c }}</div>
+        <div class="drow2"><label class="dlabel">Card C (upload)</label>{{ form.card_c_upload }}</div>
+      </div>
+
+      <div class="drow2">
+        <label class="dlabel">Ribbons (JSON)</label>
+        {{ form.ribbons_json }}
+        <div class="dhelp">Example: [{"label":"UP TO","value":"20% OFF"}]</div>
+      </div>
+      <div class="drow2">
+        <label class="dlabel">Meta pills (JSON)</label>
+        {{ form.meta_json }}
+        <div class="dhelp">Example: [{"title":"Free shipping","desc":"Above ₹499"}]</div>
+      </div>
+      <div class="drow2">
+        <label class="dlabel">Button styles (JSON)</label>
+        {{ form.button_styles }}
+        <div class="dhelp">Optional: {"primaryVariant":"primary","secondaryVariant":"ghost"}</div>
+      </div>
+
+      <div class="dactions2">
+        <button class="dbtn dbtn--primary" type="submit">Save</button>
+        <form method="post" action="{% url 'dashboard:hero_slide_delete' slide.id %}" onsubmit="return confirm('Delete this slide?')" style="display:inline;">
+          {% csrf_token %}
+          <button class="dbtn" type="submit">Delete</button>
+        </form>
+      </div>
+    </form>
+  </section>
+{% endblock %}

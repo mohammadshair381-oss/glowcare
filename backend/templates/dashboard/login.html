@@ -1,0 +1,39 @@
+{% load static %}
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>GlowCare CMS — Login</title>
+  <link rel="stylesheet" href="{% static 'dashboard/dashboard.css' %}">
+</head>
+<body class="dbody">
+  <main class="dwrap">
+    <div class="dcard">
+      <div class="dbrand">
+        <div class="dmark"></div>
+        <div>
+          <div class="dtitle">GlowCare CMS</div>
+          <div class="dsub">Sign in to manage homepage, products & theme</div>
+        </div>
+      </div>
+
+      {% if form.non_field_errors %}
+        <div class="dalert">{{ form.non_field_errors.0 }}</div>
+      {% elif form.errors %}
+        <div class="dalert">Invalid credentials. Try again.</div>
+      {% endif %}
+
+      <form method="post" class="dform">
+        {% csrf_token %}
+        <label class="dlabel">Username</label>
+        <input class="dinput" type="text" name="username" autocomplete="username" required>
+        <label class="dlabel">Password</label>
+        <input class="dinput" type="password" name="password" autocomplete="current-password" required>
+        <button class="dbtn dbtn--primary" type="submit">Sign in</button>
+      </form>
+      <div class="dmuted">Use a staff/superuser account.</div>
+    </div>
+  </main>
+</body>
+</html>

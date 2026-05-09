@@ -1,0 +1,14 @@
+services:
+  db:
+    image: postgres:16
+    environment:
+      POSTGRES_DB: glowcare
+      POSTGRES_USER: glowcare
+      POSTGRES_PASSWORD: glowcare
+    ports:
+      - "5432:5432"
+    volumes:
+      - glowcare_pg:/var/lib/postgresql/data
+
+volumes:
+  glowcare_pg:

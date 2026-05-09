@@ -1,0 +1,48 @@
+{% extends "dashboard/base.html" %}
+{% block title %}Products — GlowCare CMS{% endblock %}
+{% block header %}Products{% endblock %}
+{% block subheader %}Create/edit products, variants, pricing and badges{% endblock %}
+
+{% block content %}
+  <section class="dpanel">
+    <div class="dpanel__head">
+      <div>
+        <div class="dpanel__title">Catalog</div>
+        <div class="dpanel__sub">These products power the homepage sliders and shop pages via API</div>
+      </div>
+      <div class="dpanel__actions">
+        <a class="dbtn dbtn--primary" href="{% url 'dashboard:product_new' %}">+ New product</a>
+      </div>
+    </div>
+
+    <form method="get" style="margin-top:12px; display:flex; gap:10px; flex-wrap:wrap;">
+      <input class="dinput" name="q" value="{{ q }}" placeholder="Search by name, SKU, brand…">
+      <button class="dbtn" type="submit">Search</button>
+      <a class="dbtn" href="{% url 'dashboard:products' %}">Reset</a>
+    </form>
+
+    <div class="dtable">
+      <div class="dthead" style="grid-template-columns: 1fr 2fr 1fr 1fr 1fr 1fr;">
+        <div>SKU</div>
+        <div>Name</div>
+        <div>Category</div>
+        <div>Price</div>
+        <div>Badge</div>
+        <div></div>
+      </div>
+      {% for p in products %}
+        <div class="drow" style="grid-template-columns: 1fr 2fr 1fr 1fr 1fr 1fr;">
+          <div>{{ p.sku }}</div>
+          <div>{{ p.name }}</div>
+          <div>{{ p.category.slug }}</div>
+          <div>₹{{ p.price }}</div>
+          <div>{% if p.badge %}<span class="dpill dpill--ok">{{ p.badge }}</span>{% else %}<span class="dpill">—</span>{% endif %}</div>
+          <div><a class="dbtn" href="{% url 'dashboard:product_edit' p.id %}">Edit</a></div>
+        </div>
+      {% empty %}
+        <div class="dmuted">No products found.</div>
+      {% endfor %}
+    </div>
+  </section>
+{% endblock %}
+

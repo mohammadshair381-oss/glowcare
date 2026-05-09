@@ -1,0 +1,40 @@
+{% extends "dashboard/base.html" %}
+{% block title %}Testimonials — GlowCare CMS{% endblock %}
+{% block header %}Testimonials{% endblock %}
+{% block subheader %}Add/edit customer reviews, ratings, order and avatars{% endblock %}
+
+{% block content %}
+  <section class="dpanel">
+    <div class="dpanel__head">
+      <div>
+        <div class="dpanel__title">Reviews</div>
+        <div class="dpanel__sub">Create testimonials and edit content</div>
+      </div>
+      <div class="dpanel__actions">
+        <form method="post">{% csrf_token %}<button class="dbtn dbtn--primary" type="submit">+ New</button></form>
+      </div>
+    </div>
+
+    <div class="dtable">
+      <div class="dthead" style="grid-template-columns: 1fr 2fr 1fr 1fr 1fr;">
+        <div>Order</div>
+        <div>Name</div>
+        <div>Rating</div>
+        <div>Status</div>
+        <div></div>
+      </div>
+      {% for t in items %}
+        <div class="drow" style="grid-template-columns: 1fr 2fr 1fr 1fr 1fr;">
+          <div>{{ t.sort_order }}</div>
+          <div>{{ t.name }}</div>
+          <div>{{ t.rating }}</div>
+          <div>{% if t.enabled %}<span class="dpill dpill--ok">Enabled</span>{% else %}<span class="dpill">Disabled</span>{% endif %}</div>
+          <div><a class="dbtn" href="{% url 'dashboard:testimonial_edit' t.id %}">Edit</a></div>
+        </div>
+      {% empty %}
+        <div class="dmuted">No testimonials yet.</div>
+      {% endfor %}
+    </div>
+  </section>
+{% endblock %}
+

@@ -1,0 +1,69 @@
+{% extends "dashboard/base.html" %}
+{% block title %}Announcement — GlowCare CMS{% endblock %}
+{% block header %}Announcement Bar{% endblock %}
+{% block subheader %}Schedule, colors and visibility for the top strip{% endblock %}
+
+{% block content %}
+  <section class="dpanel">
+    <div class="dpanel__head">
+      <div>
+        <div class="dpanel__title">Bar Settings</div>
+        <div class="dpanel__sub">Changes reflect on the homepage after refresh</div>
+      </div>
+      <div class="dpanel__actions">
+        <a class="dbtn" href="/" target="_blank" rel="noreferrer">Preview</a>
+      </div>
+    </div>
+
+    <form method="post" class="dform2" style="margin-top:12px;">
+      {% csrf_token %}
+
+      <div class="drow2">
+        <label class="dlabel">Enabled</label>
+        {{ form.enabled }}
+      </div>
+
+      <div class="dgrid2">
+        <div class="drow2">
+          <label class="dlabel">Badge</label>
+          {{ form.badge }}
+        </div>
+        <div class="drow2">
+          <label class="dlabel">CTA text</label>
+          {{ form.cta_text }}
+        </div>
+      </div>
+
+      <div class="drow2">
+        <label class="dlabel">Text</label>
+        {{ form.text }}
+      </div>
+
+      <div class="drow2">
+        <label class="dlabel">CTA href</label>
+        {{ form.cta_href }}
+      </div>
+
+      <div class="drow2">
+        <label class="dlabel">Background (CSS)</label>
+        {{ form.bg }}
+        <div class="dhelp">Optional. If blank, frontend uses default premium gradient.</div>
+      </div>
+
+      <div class="dgrid2">
+        <div class="drow2">
+          <label class="dlabel">Start at (optional)</label>
+          {{ form.start_at }}
+        </div>
+        <div class="drow2">
+          <label class="dlabel">End at (optional)</label>
+          {{ form.end_at }}
+        </div>
+      </div>
+
+      <div class="dactions2">
+        <button class="dbtn dbtn--primary" type="submit">Save</button>
+      </div>
+    </form>
+  </section>
+{% endblock %}

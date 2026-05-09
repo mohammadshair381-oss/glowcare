@@ -1,0 +1,71 @@
+{% extends "dashboard/base.html" %}
+{% block title %}Media Library — GlowCare CMS{% endblock %}
+{% block header %}Media Library{% endblock %}
+{% block subheader %}Upload images/videos and reuse across hero, products, banners{% endblock %}
+
+{% block content %}
+  <section class="dpanel">
+    <div class="dpanel__head">
+      <div>
+        <div class="dpanel__title">Upload</div>
+        <div class="dpanel__sub">Files are stored under `/media/uploads/...`</div>
+      </div>
+    </div>
+
+    <form method="post" enctype="multipart/form-data" style="margin-top:12px; display:grid; grid-template-columns: 1fr 1fr; gap: 12px;">
+      {% csrf_token %}
+      <div class="drow2">
+        <label class="dlabel">Title</label>
+        <input class="dinput" name="title" placeholder="Berry hero card…">
+      </div>
+      <div class="drow2">
+        <label class="dlabel">Alt</label>
+        <input class="dinput" name="alt" placeholder="Product image">
+      </div>
+      <div class="drow2">
+        <label class="dlabel">Kind</label>
+        <select class="dinput" name="kind">
+          <option value="image">Image</option>
+          <option value="video">Video</option>
+        </select>
+      </div>
+      <div class="drow2">
+        <label class="dlabel">File</label>
+        <input class="dinput" type="file" name="file" required>
+      </div>
+      <div style="grid-column: 1 / -1;">
+        <button class="dbtn dbtn--primary" type="submit">Upload</button>
+      </div>
+    </form>
+  </section>
+
+  <section class="dpanel">
+    <div class="dpanel__head">
+      <div>
+        <div class="dpanel__title">Assets</div>
+        <div class="dpanel__sub">Copy URLs to use in hero/cards, or select in product editor</div>
+      </div>
+    </div>
+
+    <div style="margin-top:12px; display:grid; grid-template-columns: repeat(6, minmax(0, 1fr)); gap: 10px;">
+      {% for a in assets %}
+        <div style="border:1px solid rgba(255,255,255,.10); background: rgba(0,0,0,.18); border-radius: 18px; overflow:hidden;">
+          <div style="aspect-ratio: 1 / 1; display:grid; place-items:center; background: rgba(255,255,255,.04);">
+            {% if a.kind == "image" %}
+              <img src="{{ a.file.url }}" alt="" style="max-width: 92%; max-height: 92%;">
+            {% else %}
+              <div class="dmuted">Video</div>
+            {% endif %}
+          </div>
+          <div style="padding:10px;">
+            <div style="font-weight:900; font-size:12px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;">{{ a.title|default:a.file.name }}</div>
+            <div class="dhelp" style="margin-top:6px; word-break: break-all;">{{ a.file.url }}</div>
+          </div>
+        </div>
+      {% empty %}
+        <div class="dmuted">No assets yet.</div>
+      {% endfor %}
+    </div>
+  </section>
+{% endblock %}
+

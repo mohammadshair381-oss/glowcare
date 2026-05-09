@@ -1,17 +1,21 @@
+{% load static %}
 <!doctype html>
 <html lang="en">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Shop | GlowCare</title>
-  <meta name="description" content="Shop GlowCare products with filters, sort, and search. Frontend-only demo store.">
-  <link rel="stylesheet" href="css/style.css">
-  <link rel="stylesheet" href="css/navbar.css">
-  <link rel="stylesheet" href="css/animations.css">
-  <link rel="stylesheet" href="css/shop.css">
-  <link rel="stylesheet" href="css/responsive.css">
+  <meta name="description" content="Shop GlowCare products with filters, sort, and search.">
+  <meta name="gc-static-base" content="{% static '' %}">
+
+  <link rel="stylesheet" href="{% static 'css/style.css' %}">
+  <link rel="stylesheet" href="{% static 'css/navbar.css' %}">
+  <link rel="stylesheet" href="{% static 'css/animations.css' %}">
+  <link rel="stylesheet" href="{% static 'css/shop.css' %}">
+  <link rel="stylesheet" href="{% static 'css/responsive.css' %}">
 </head>
 <body>
+  <div id="gcAnnouncement"></div>
   <div id="appNavbar"></div>
 
   <main class="shop" id="shopPage">
@@ -82,22 +86,22 @@
         <section>
           <div class="shop__top">
             <div>
-              <h1 class="title" style="font-size:26px;">Shop</h1>
-              <div class="shop__meta" id="shopMeta">—</div>
+              <h1 class="title" style="font-size: 26px; color: var(--text);">Shop</h1>
+              <p style="margin-top: 6px;">Curated premium essentials for everyday glow.</p>
             </div>
-            <div class="shop__searchRow">
-              <button class="btn btn--neo shine shop__filtersBtn" type="button" id="openFilters">Filters</button>
-              <input class="input shop__search" id="shopQ" placeholder="Search products...">
-              <select class="select shop__sort" id="shopSort" aria-label="Sort">
-                <option value="popular">Sort: Popular</option>
-                <option value="rating">Sort: Rating</option>
-                <option value="price_asc">Sort: Price (low)</option>
-                <option value="price_desc">Sort: Price (high)</option>
+            <div class="shop__controls">
+              <button class="btn btn--ghost shop__filterBtn" id="openFilters" type="button">Filters</button>
+              <select class="select" id="sortSelect" aria-label="Sort">
+                <option value="popular">Popular</option>
+                <option value="rating">Top rated</option>
+                <option value="price_asc">Price: Low to high</option>
+                <option value="price_desc">Price: High to low</option>
               </select>
             </div>
           </div>
 
-          <div class="products-grid rail" id="shopGrid" data-animate="fade-in"></div>
+          <div class="shop__results" id="resultsCount" aria-live="polite"></div>
+          <div class="grid cards" id="shopGrid" data-animate="fade-in"></div>
         </section>
       </div>
     </div>
@@ -105,8 +109,9 @@
 
   <div id="appFooter"></div>
 
-  <script src="js/main.js"></script>
-  <script src="js/animations.js"></script>
-  <script src="js/shop.js"></script>
+  <script src="{% static 'js/main.js' %}"></script>
+  <script src="{% static 'js/cms-client.js' %}"></script>
+  <script src="{% static 'js/animations.js' %}"></script>
+  <script src="{% static 'js/shop.js' %}"></script>
 </body>
 </html>

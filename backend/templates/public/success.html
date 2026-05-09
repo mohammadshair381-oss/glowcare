@@ -1,0 +1,40 @@
+{% load static %}
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Success | GlowCare</title>
+  <meta name="description" content="Order success - GlowCare frontend-only demo store.">
+  <meta name="gc-static-base" content="{% static '' %}">
+  <link rel="stylesheet" href="{% static 'css/style.css' %}">
+  <link rel="stylesheet" href="{% static 'css/navbar.css' %}">
+  <link rel="stylesheet" href="{% static 'css/success.css' %}">
+  <link rel="stylesheet" href="{% static 'css/responsive.css' %}">
+</head>
+<body data-require-auth="true">
+  <div id="appNavbar"></div>
+
+  <main class="success" id="successPage">
+    <div class="container">
+      <div class="panel success__card">
+        <div class="success__icon">✓</div>
+        <div class="success__title">Order confirmed</div>
+        <p class="success__sub">Your order <strong id="orderId">—</strong> has been placed successfully.</p>
+
+        <div class="order" id="orderSummary"></div>
+
+        <div style="margin-top: 16px; display:flex; gap: 10px; justify-content:center; flex-wrap: wrap;">
+          <a class="btn btn--primary" href="shop.html">Continue shopping</a>
+          <a class="btn btn--ghost" href="account.html">View orders</a>
+        </div>
+      </div>
+    </div>
+  </main>
+
+  <div id="appFooter"></div>
+
+  <script src="{% static 'js/main.js' %}"></script>
+  <script src="{% static 'js/success.js' %}"></script>
+</body>
+</html>

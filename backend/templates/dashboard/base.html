@@ -1,0 +1,66 @@
+{% load static %}
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>{% block title %}GlowCare CMS{% endblock %}</title>
+  <link rel="stylesheet" href="{% static 'dashboard/dashboard.css' %}">
+  <script defer src="https://unpkg.com/htmx.org@2.0.4"></script>
+  <script defer src="https://cdn.jsdelivr.net/npm/sortablejs@1.15.2/Sortable.min.js"></script>
+  <script defer src="{% static 'dashboard/dashboard.js' %}"></script>
+</head>
+<body class="dbody">
+  <div class="dlayout">
+    <aside class="dside">
+      <a class="dside__brand" href="{% url 'dashboard:home' %}">
+        <span class="dside__mark"></span>
+        <span>GlowCare CMS</span>
+      </a>
+      <nav class="dnav">
+        <a class="dnav__link" href="{% url 'dashboard:home' %}">Dashboard</a>
+        <a class="dnav__link" href="{% url 'dashboard:homepage_builder' %}">Homepage Builder</a>
+        <a class="dnav__link" href="{% url 'dashboard:homepage_editor' %}">Visual Editor</a>
+        <a class="dnav__link" href="{% url 'dashboard:hero_slides' %}">Hero Slides</a>
+        <a class="dnav__link" href="{% url 'dashboard:promo' %}">Promo Banner</a>
+        <a class="dnav__link" href="{% url 'dashboard:app_banner' %}">App Banner</a>
+        <a class="dnav__link" href="{% url 'dashboard:testimonials' %}">Testimonials</a>
+        <a class="dnav__link" href="{% url 'dashboard:logos' %}">Featured Logos</a>
+        <a class="dnav__link" href="{% url 'dashboard:navigation' %}">Navbar</a>
+        <a class="dnav__link" href="{% url 'dashboard:footer' %}">Footer</a>
+        <a class="dnav__link" href="{% url 'dashboard:products' %}">Products</a>
+        <a class="dnav__link" href="{% url 'dashboard:product_sections' %}">Product Sections</a>
+        <a class="dnav__link" href="{% url 'dashboard:media' %}">Media Library</a>
+        <a class="dnav__link" href="{% url 'dashboard:theme' %}">Theme</a>
+        <a class="dnav__link" href="{% url 'dashboard:announcement' %}">Announcement</a>
+      </nav>
+      <div class="dside__foot">
+        <div class="duser">
+          <div class="duser__ava"></div>
+          <div>
+            <div class="duser__name">{{ request.user.get_username }}</div>
+            <div class="duser__meta">Staff</div>
+          </div>
+        </div>
+        <a class="dnav__link dnav__link--ghost" href="{% url 'dashboard:logout' %}">Logout</a>
+      </div>
+    </aside>
+
+    <div class="dmain">
+      <header class="dtop">
+        <div>
+          <div class="dtop__title">{% block header %}{% endblock %}</div>
+          <div class="dtop__sub">{% block subheader %}{% endblock %}</div>
+        </div>
+        <div class="dtop__actions">
+          <a class="dbtn" href="/" target="_blank" rel="noreferrer">Live preview</a>
+        </div>
+      </header>
+
+      <main class="dcontent">
+        {% block content %}{% endblock %}
+      </main>
+    </div>
+  </div>
+</body>
+</html>

@@ -1,0 +1,92 @@
+{% load static %}
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Payment | GlowCare</title>
+  <meta name="description" content="Payment - GlowCare frontend-only demo store.">
+  <meta name="gc-static-base" content="{% static '' %}">
+  <link rel="stylesheet" href="{% static 'css/style.css' %}">
+  <link rel="stylesheet" href="{% static 'css/navbar.css' %}">
+  <link rel="stylesheet" href="{% static 'css/payment.css' %}">
+  <link rel="stylesheet" href="{% static 'css/responsive.css' %}">
+</head>
+<body data-require-auth="true">
+  <div id="appNavbar"></div>
+
+  <main class="payment" id="paymentPage">
+    <div class="container">
+      <div class="section__head section__head--split">
+        <div>
+          <h1 class="section__title">Payment</h1>
+          <p class="section__hint">Choose a method (simulation)</p>
+        </div>
+        <a class="btn btn--ghost" href="checkout.html">Back</a>
+      </div>
+
+      <div class="paygrid" style="margin-top:16px;">
+        <section class="panel">
+          <div class="title" style="font-size:18px;">Payment method</div>
+
+          <div class="methods" style="margin-top: 12px;">
+            <label class="method is-active" data-method="upi">
+              <input type="radio" name="payMethod" value="upi" checked>
+              <div class="method__t">UPI</div>
+              <div class="method__s">Pay using UPI ID</div>
+            </label>
+
+            <label class="method" data-method="card">
+              <input type="radio" name="payMethod" value="card">
+              <div class="method__t">Card</div>
+              <div class="method__s">Credit / Debit (demo)</div>
+            </label>
+
+            <label class="method" data-method="cod">
+              <input type="radio" name="payMethod" value="cod">
+              <div class="method__t">COD</div>
+              <div class="method__s">Cash on delivery</div>
+            </label>
+          </div>
+
+          <div id="upiBlock" style="margin-top: 12px;">
+            <div class="field">
+              <label class="label" for="upiVpa">UPI ID</label>
+              <input class="input" id="upiVpa" placeholder="name@bank">
+            </div>
+          </div>
+
+          <div id="cardBlock" style="margin-top: 12px;" hidden>
+            <div class="field">
+              <label class="label" for="cardNumber">Card number</label>
+              <input class="input" id="cardNumber" placeholder="1234 5678 9012 3456">
+            </div>
+            <div style="display:grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-top: 12px;">
+              <div class="field">
+                <label class="label" for="cardExp">Expiry</label>
+                <input class="input" id="cardExp" placeholder="MM/YY">
+              </div>
+              <div class="field">
+                <label class="label" for="cardCvv">CVV</label>
+                <input class="input" id="cardCvv" placeholder="123">
+              </div>
+            </div>
+          </div>
+
+          <div style="margin-top: 14px; display:grid; gap: 10px;">
+            <button class="btn btn--primary btn--full" type="button" id="payNow">Pay now</button>
+            <p class="help">Payment is simulated and can fail to test retry.</p>
+          </div>
+        </section>
+
+        <aside id="paymentSummary"></aside>
+      </div>
+    </div>
+  </main>
+
+  <div id="appFooter"></div>
+
+  <script src="{% static 'js/main.js' %}"></script>
+  <script src="{% static 'js/payment.js' %}"></script>
+</body>
+</html>

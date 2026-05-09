@@ -1,0 +1,36 @@
+{% extends "dashboard/base.html" %}
+{% block title %}Edit Product Section — GlowCare CMS{% endblock %}
+{% block header %}Edit Product Section{% endblock %}
+{% block subheader %}Tabs JSON controls homepage rail content{% endblock %}
+
+{% block content %}
+  <section class="dpanel">
+    <div class="dpanel__head">
+      <div>
+        <div class="dpanel__title">{{ obj.kind }}</div>
+        <div class="dpanel__sub">Filters are matched on frontend (badge/category/concern/search)</div>
+      </div>
+      <div class="dpanel__actions">
+        <a class="dbtn" href="{% url 'dashboard:product_sections' %}">Back</a>
+        <a class="dbtn" href="/" target="_blank" rel="noreferrer">Preview</a>
+      </div>
+    </div>
+
+    <form method="post" class="dform2" style="margin-top:12px;">
+      {% csrf_token %}
+      <div class="drow2"><label class="dlabel">Enabled</label>{{ form.enabled }}</div>
+      <div class="drow2"><label class="dlabel">Title</label>{{ form.title }}</div>
+      <div class="drow2"><label class="dlabel">Subtitle</label>{{ form.subtitle }}</div>
+      <div class="drow2"><label class="dlabel">View all href</label>{{ form.view_all_href }}</div>
+      <div class="drow2">
+        <label class="dlabel">Tabs JSON</label>
+        {{ form.tabs_json }}
+        <div class="dhelp">Example tab: {"id":"sunscreen","label":"Sunscreen","filter":{"search":"sunscreen"}}</div>
+      </div>
+      <div class="dactions2">
+        <button class="dbtn dbtn--primary" type="submit">Save</button>
+      </div>
+    </form>
+  </section>
+{% endblock %}
+

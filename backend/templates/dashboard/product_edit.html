@@ -1,0 +1,102 @@
+{% extends "dashboard/base.html" %}
+{% block title %}{% if product %}Edit Product{% else %}New Product{% endif %} — GlowCare CMS{% endblock %}
+{% block header %}{% if product %}Edit Product{% else %}New Product{% endif %}{% endblock %}
+{% block subheader %}Premium catalog data powering the frontend{% endblock %}
+
+{% block content %}
+  <section class="dpanel">
+    <div class="dpanel__head">
+      <div>
+        <div class="dpanel__title">{% if product %}{{ product.name }}{% else %}Create product{% endif %}</div>
+        <div class="dpanel__sub">Save to publish to API instantly</div>
+      </div>
+      <div class="dpanel__actions">
+        <a class="dbtn" href="{% url 'dashboard:products' %}">Back</a>
+      </div>
+    </div>
+
+    <form method="post" class="dform2" enctype="multipart/form-data">
+      {% csrf_token %}
+      <div class="dgrid2">
+        <div class="drow2"><label class="dlabel">SKU</label>{{ form.sku }}</div>
+        <div class="drow2"><label class="dlabel">Name</label>{{ form.name }}</div>
+      </div>
+      <div class="dgrid2">
+        <div class="drow2"><label class="dlabel">Brand</label>{{ form.brand }}</div>
+        <div class="drow2"><label class="dlabel">Category</label>{{ form.category }}</div>
+      </div>
+      <div class="drow2"><label class="dlabel">Description</label>{{ form.description }}</div>
+      <div class="dgrid2">
+        <div class="drow2"><label class="dlabel">Price (₹)</label>{{ form.price }}</div>
+        <div class="drow2"><label class="dlabel">Compare at (MRP)</label>{{ form.compare_at_price }}</div>
+      </div>
+      <div class="dgrid2">
+        <div class="drow2"><label class="dlabel">Badge</label>{{ form.badge }}</div>
+        <div class="drow2"><label class="dlabel">Primary media</label>{{ form.primary_media }}</div>
+      </div>
+      <div class="dgrid2">
+        <div class="drow2"><label class="dlabel">Rating</label>{{ form.rating }}</div>
+        <div class="drow2"><label class="dlabel">Reviews count</label>{{ form.reviews_count }}</div>
+      </div>
+      <div class="dgrid2">
+        <div class="drow2"><label class="dlabel">Active</label>{{ form.is_active }}</div>
+        <div class="drow2"><label class="dlabel">Published</label>{{ form.is_published }}</div>
+      </div>
+
+      <div class="drow2"><label class="dlabel">Concern tags</label>{{ form.concern_tags_csv }}<div class="dhelp">{{ form.concern_tags_csv.help_text }}</div></div>
+      <div class="drow2"><label class="dlabel">Skin type tags</label>{{ form.skin_type_tags_csv }}<div class="dhelp">{{ form.skin_type_tags_csv.help_text }}</div></div>
+      <div class="drow2"><label class="dlabel">Ingredients</label>{{ form.ingredients_csv }}<div class="dhelp">{{ form.ingredients_csv.help_text }}</div></div>
+
+      <div class="dactions2">
+        <button class="dbtn dbtn--primary" type="submit">Save product</button>
+        <a class="dbtn" href="{% url 'dashboard:products' %}">Cancel</a>
+      </div>
+    </form>
+  </section>
+
+  {% if product %}
+    <section class="dpanel">
+      <div class="dpanel__head">
+        <div>
+          <div class="dpanel__title">Variants</div>
+          <div class="dpanel__sub">SKU, size and stock</div>
+        </div>
+      </div>
+
+      <div class="dtable">
+        <div class="dthead" style="grid-template-columns: 1fr 1fr .8fr .8fr .8fr;">
+          <div>SKU</div>
+          <div>Shade</div>
+          <div>Size (ml)</div>
+          <div>Stock</div>
+          <div>Status</div>
+        </div>
+        {% for v in variants %}
+          <div class="drow" style="grid-template-columns: 1fr 1fr .8fr .8fr .8fr;">
+            <div>{{ v.sku }}</div>
+            <div>{{ v.shade }}</div>
+            <div>{{ v.size_ml|default:"—" }}</div>
+            <div>{{ v.stock }}</div>
+            <div>{% if v.is_active %}<span class="dpill dpill--ok">Active</span>{% else %}<span class="dpill">Disabled</span>{% endif %}</div>
+          </div>
+        {% empty %}
+          <div class="dmuted">No variants yet.</div>
+        {% endfor %}
+      </div>
+
+      <form method="post" action="{% url 'dashboard:product_variant_add' product.id %}" class="dform2" style="margin-top:14px;">
+        {% csrf_token %}
+        <div class="dpanel__sub" style="margin-bottom:8px;">Add variant</div>
+        {% for field in vform %}
+          <div class="drow2">
+            <label class="dlabel">{{ field.label }}</label>
+            {{ field }}
+          </div>
+        {% endfor %}
+        <div class="dactions2">
+          <button class="dbtn dbtn--primary" type="submit">Add variant</button>
+        </div>
+      </form>
+    </section>
+  {% endif %}
+{% endblock %}

@@ -346,6 +346,40 @@
   }
 
   /* ---------- Catalog ---------- */
+  const CATALOG_API = "/api/v1/products/";
+
+  function normalizeApiCatalog(payload) {
+    const list = Array.isArray(payload) ? payload : Array.isArray(payload?.results) ? payload.results : [];
+    if (!Array.isArray(list)) return null;
+    // Ensure minimal shape used across frontend
+    return list
+      .filter(Boolean)
+      .map((p) => ({
+        ...p,
+        id: String(p.id),
+        price: Number(p.price) || 0,
+        rating: Number(p.rating) || 0,
+        reviewsCount: Number(p.reviewsCount ?? p.reviews_count) || 0,
+        badge: p.badge || "",
+        variants: Array.isArray(p.variants) ? p.variants : [],
+      }))
+      .filter((p) => p.id && p.name);
+  }
+
+  async function tryFetchCatalogFromAPI(timeoutMs = 1200) {
+    try {
+      const ctrl = "AbortController" in window ? new AbortController() : null;
+      const t = ctrl ? window.setTimeout(() => ctrl.abort(), timeoutMs) : null;
+      const res = await fetch(CATALOG_API, { credentials: "same-origin", signal: ctrl?.signal });
+      if (t) window.clearTimeout(t);
+      if (!res.ok) return null;
+      const json = await res.json();
+      return normalizeApiCatalog(json);
+    } catch {
+      return null;
+    }
+  }
+
   function getCatalog() {
     const stored = safeParse(localStorage.getItem(KEYS.catalog), null);
     if (Array.isArray(stored) && stored.length) return stored;
@@ -358,7 +392,8 @@
   }
 
   function getProductById(id) {
-    return getCatalog().find((p) => p.id === id) || null;
+    const want = String(id);
+    return getCatalog().find((p) => String(p.id) === want) || null;
   }
 
   function getVariant(product, variantKey) {
@@ -627,22 +662,40 @@
 
   async function injectComponent(targetId, path) {
     const target = document.getElementById(targetId);
-    if (!target) return;
+    if (!target) return false;
     try {
       const inline = getInlineComponent(path);
       if (inline) {
         target.innerHTML = inline;
-        return;
+        return true;
       }
       const res = await fetch(path, { cache: "no-store" });
+      if (!res.ok) return false;
       let html = await res.text();
       // Live Server injects reload scripts into fetched HTML/SVG fragments which can break inline SVG markup.
       // Strip *all* script tags + the known comment marker from component HTML before injecting.
       html = html.replace(/<!-- Code injected by live-server -->/g, "");
       html = html.replace(/<script\b[^<]*(?:(?!<\/script>)<[^<]*)*<\/script>\s*/gi, "");
+
+      // When running under Django, components are fetched from `/static/components/*` but their internal
+      // asset URLs are still written as `assets/...`. Rewrite these to include the Django static base.
+      const staticBase =
+        (typeof window !== "undefined" && window.GLOWCARE_STATIC_BASE) ||
+        (document.querySelector('meta[name="gc-static-base"]')?.getAttribute("content") || "");
+      if (staticBase) {
+        const base = staticBase.endsWith("/") ? staticBase : `${staticBase}/`;
+        html = html.replace(/(\b(?:src|href)\s*=\s*)(["'])(assets\/|css\/|js\/|components\/)([^"']*)\2/g, (_m, a, q, dir, rest) => {
+          return `${a}${q}${base}${dir}${rest}${q}`;
+        });
+        html = html.replace(/(\b(?:src|href)\s*=\s*)(["'])(style\.css|script\.js)\2/g, (_m, a, q, file) => {
+          return `${a}${q}${base}${file}${q}`;
+        });
+      }
       target.innerHTML = html;
+      return true;
     } catch {
       // ignore
+      return false;
     }
   }
 
@@ -764,7 +817,7 @@
     const user = getCurrentUser();
     const adminMode = localStorage.getItem(KEYS.adminMode) === "1";
     if (user?.role === "admin" && adminMode) return true;
-    window.location.href = "account.html";
+    // window.location.href = "account.html";
     return false;
   }
 
@@ -777,22 +830,12 @@
       const withCtrlShift = e.ctrlKey && e.shiftKey;
 
       if (withCtrlShift && isA) {
-        const user = getCurrentUser();
-        if (user?.role !== "admin") {
-          toast("Admin requires admin login");
-          return;
-        }
-        localStorage.setItem(KEYS.adminMode, "1");
-        toast("Admin mode enabled");
-        if (!window.location.pathname.endsWith("admin.html")) window.location.href = "admin.html";
+        toast("Opening dashboard");
+        window.location.href = "/dashboard/";
       }
 
       if ((withCtrlShift && isU) || isEsc) {
-        if (localStorage.getItem(KEYS.adminMode) === "1") {
-          localStorage.removeItem(KEYS.adminMode);
-          toast("User mode enabled");
-          if (window.location.pathname.endsWith("admin.html")) window.location.href = "account.html";
-        }
+        // Legacy: previously toggled the static admin.html "admin mode". Kept as a no-op.
       }
     });
   }
@@ -820,9 +863,24 @@
   async function boot() {
     await loadInlineComponentsIfNeeded();
     // Use `.xml` to avoid VS Code Live Server injecting reload scripts into fetched `.html` fragments with inline SVG.
-    await injectComponent("appNavbar", "components/navbar.xml");
-    await injectComponent("appFooter", "components/footer.xml");
+    const staticBase =
+      (typeof window !== "undefined" && window.GLOWCARE_STATIC_BASE) ||
+      (document.querySelector('meta[name="gc-static-base"]')?.getAttribute("content") || "");
+    const navPath = `${staticBase}components/navbar.xml`;
+    const footPath = `${staticBase}components/footer.xml`;
+    // If staticBase isn't set (e.g. legacy static HTML under Django), retry under /static/
+    const tryInject = async (mountId, path) => {
+      const ok = await injectComponent(mountId, path);
+      if (ok) return true;
+      if (!staticBase) return injectComponent(mountId, `/static/${path}`);
+      return false;
+    };
+    await tryInject("appNavbar", navPath);
+    await tryInject("appFooter", footPath);
     ensureToast();
+    // Prefer backend-driven catalog when available (CMS mode). Falls back to local default offline.
+    const apiCatalog = await tryFetchCatalogFromAPI(1400);
+    if (Array.isArray(apiCatalog) && apiCatalog.length) setCatalog(apiCatalog);
     updateCounts();
     updateNavbarAuthUI();
     setupMobileNav();

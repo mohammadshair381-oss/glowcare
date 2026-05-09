@@ -212,6 +212,40 @@
     }
   }
 
+  function setupFiltersDrawer() {
+    const panel = document.getElementById("filtersPanel");
+    const backdrop = document.getElementById("filtersBackdrop");
+    const openBtn = document.getElementById("openFilters");
+    const closeBtn = document.getElementById("closeFilters");
+    const card = panel?.querySelector(".filters__card");
+    if (!panel || !backdrop || !openBtn || !closeBtn || !card) return;
+
+    function open() {
+      panel.classList.add("is-open");
+      backdrop.hidden = false;
+      card.setAttribute("aria-hidden", "false");
+      document.body.style.overflow = "hidden";
+    }
+    function close() {
+      panel.classList.remove("is-open");
+      backdrop.hidden = true;
+      card.setAttribute("aria-hidden", "true");
+      document.body.style.overflow = "";
+    }
+
+    openBtn.addEventListener("click", open);
+    closeBtn.addEventListener("click", close);
+    backdrop.addEventListener("click", close);
+    document.addEventListener("keydown", (e) => {
+      if (e.key === "Escape" && panel.classList.contains("is-open")) close();
+    });
+
+    // If we move from mobile->desktop while open, restore scroll.
+    window.addEventListener("resize", () => {
+      if (window.innerWidth > 980) close();
+    });
+  }
+
   function renderSkeleton() {
     const grid = document.getElementById("shopGrid");
     if (!grid) return;
@@ -238,6 +272,7 @@
     if (!document.getElementById("shopGrid")) return;
     renderSkeleton();
     setupUI();
+    setupFiltersDrawer();
     window.setTimeout(render, 280);
   });
 })();
