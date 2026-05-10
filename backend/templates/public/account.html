@@ -5,14 +5,18 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Account | GlowCare</title>
-  <meta name="description" content="Account - GlowCare frontend-only demo store.">
+  <meta name="description" content="Your GlowCare account.">
   <meta name="gc-static-base" content="{% static '' %}">
   <link rel="stylesheet" href="{% static 'css/style.css' %}">
   <link rel="stylesheet" href="{% static 'css/navbar.css' %}">
   <link rel="stylesheet" href="{% static 'css/account.css' %}">
   <link rel="stylesheet" href="{% static 'css/responsive.css' %}">
 </head>
-<body>
+<body data-authenticated="{% if request.user.is_authenticated %}true{% else %}false{% endif %}"
+      data-user-id="{% if request.user.is_authenticated %}{{ request.user.id }}{% endif %}"
+      data-user-email="{% if request.user.is_authenticated %}{{ request.user.email }}{% endif %}"
+      data-user-name="{% if request.user.is_authenticated %}{{ request.user.first_name|default:request.user.get_username }}{% endif %}"
+      data-user-role="{% if request.user.is_authenticated %}{% if request.user.is_staff %}admin{% else %}customer{% endif %}{% endif %}">
   <div id="appNavbar"></div>
 
   <main class="account" id="accountPage">
@@ -22,16 +26,19 @@
           <h1 class="section__title">Account</h1>
           <p class="section__hint">Profile, orders, and activity</p>
         </div>
-        <button class="btn btn--ghost" type="button" id="logoutBtn">Logout</button>
+        <form method="post" action="{% url 'customers:logout' %}">
+          {% csrf_token %}
+          <button class="btn btn--ghost" type="submit" id="logoutBtn">Logout</button>
+        </form>
       </div>
 
       <div class="account__grid" style="margin-top:16px;">
         <aside class="sidebar panel">
           <div class="title" style="font-size:18px;">Profile</div>
           <div style="margin-top:8px; display:grid; gap: 6px;">
-            <div><strong id="acctName">—</strong></div>
-            <div style="color: var(--sub); font-size: 13px;" id="acctEmail">—</div>
-            <div style="color: var(--sub); font-size: 13px;">Role: <strong id="acctRole">—</strong></div>
+            <div><strong id="acctName">{{ request.user.first_name|default:request.user.get_username }}</strong></div>
+            <div style="color: var(--sub); font-size: 13px;" id="acctEmail">{{ request.user.email }}</div>
+            <div style="color: var(--sub); font-size: 13px;">Role: <strong id="acctRole">{% if request.user.is_staff %}Admin{% else %}Customer{% endif %}</strong></div>
           </div>
 
           <div style="margin-top: 12px; display:grid; gap: 10px;">

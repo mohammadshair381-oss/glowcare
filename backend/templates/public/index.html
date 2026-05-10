@@ -16,7 +16,11 @@
   <link rel="stylesheet" href="{% static 'style.css' %}">
   <meta name="gc-static-base" content="{% static '' %}">
 </head>
-<body>
+<body data-authenticated="{% if request.user.is_authenticated %}true{% else %}false{% endif %}"
+      data-user-id="{% if request.user.is_authenticated %}{{ request.user.id }}{% endif %}"
+      data-user-email="{% if request.user.is_authenticated %}{{ request.user.email }}{% endif %}"
+      data-user-name="{% if request.user.is_authenticated %}{{ request.user.first_name|default:request.user.get_username }}{% endif %}"
+      data-user-role="{% if request.user.is_authenticated %}{% if request.user.is_staff %}admin{% else %}customer{% endif %}{% endif %}">
   <div class="gc-progress" aria-hidden="true"><span class="gc-progress__bar" id="gcScrollProgress"></span></div>
 
   <div class="gc-fx" aria-hidden="true">

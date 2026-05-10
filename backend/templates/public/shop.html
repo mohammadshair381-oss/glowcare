@@ -14,7 +14,11 @@
   <link rel="stylesheet" href="{% static 'css/shop.css' %}">
   <link rel="stylesheet" href="{% static 'css/responsive.css' %}">
 </head>
-<body>
+<body data-authenticated="{% if request.user.is_authenticated %}true{% else %}false{% endif %}"
+      data-user-id="{% if request.user.is_authenticated %}{{ request.user.id }}{% endif %}"
+      data-user-email="{% if request.user.is_authenticated %}{{ request.user.email }}{% endif %}"
+      data-user-name="{% if request.user.is_authenticated %}{{ request.user.first_name|default:request.user.get_username }}{% endif %}"
+      data-user-role="{% if request.user.is_authenticated %}{% if request.user.is_staff %}admin{% else %}customer{% endif %}{% endif %}">
   <div id="gcAnnouncement"></div>
   <div id="appNavbar"></div>
 

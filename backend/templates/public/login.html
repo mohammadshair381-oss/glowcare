@@ -5,39 +5,44 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Login | GlowCare</title>
-  <meta name="description" content="Login - GlowCare frontend-only demo store.">
+  <meta name="description" content="Login to your GlowCare account.">
   <meta name="gc-static-base" content="{% static '' %}">
   <link rel="stylesheet" href="{% static 'css/style.css' %}">
   <link rel="stylesheet" href="{% static 'css/navbar.css' %}">
   <link rel="stylesheet" href="{% static 'css/login.css' %}">
   <link rel="stylesheet" href="{% static 'css/responsive.css' %}">
 </head>
-<body>
+<body data-authenticated="{% if request.user.is_authenticated %}true{% else %}false{% endif %}"
+      data-user-id="{% if request.user.is_authenticated %}{{ request.user.id }}{% endif %}"
+      data-user-email="{% if request.user.is_authenticated %}{{ request.user.email }}{% endif %}"
+      data-user-name="{% if request.user.is_authenticated %}{{ request.user.first_name|default:request.user.get_username }}{% endif %}"
+      data-user-role="{% if request.user.is_authenticated %}{% if request.user.is_staff %}admin{% else %}customer{% endif %}{% endif %}">
   <div id="appNavbar"></div>
 
   <main class="auth" id="loginPage">
     <div class="container">
       <div class="panel auth__wrap">
         <h1 class="auth__title">Welcome back</h1>
-        <p class="auth__sub">Use demo: <strong>demo@glowcare.example</strong> / <strong>demo123</strong></p>
-        <p class="auth__sub">Admin: <strong>admin@glowcare.example</strong> / <strong>admin123</strong></p>
+        <p class="auth__sub">Log in to continue.</p>
 
-        <form id="loginForm" class="auth__form">
+        <form id="loginForm" class="auth__form" method="post" action="{% url 'customers:login' %}">
+          {% csrf_token %}
+          {% if next %}<input type="hidden" name="next" value="{{ next }}">{% endif %}
           <div class="field">
             <label class="label" for="email">Email</label>
-            <input class="input" id="email" autocomplete="email">
+            <input class="input" id="email" name="username" type="email" autocomplete="email" required value="{{ form.username.value|default_if_none:'' }}">
           </div>
           <div class="field">
             <label class="label" for="password">Password</label>
-            <input class="input" id="password" type="password" autocomplete="current-password">
+            <input class="input" id="password" name="password" type="password" autocomplete="current-password" required>
           </div>
-          <div class="error" id="loginError"></div>
+          <div class="error" id="loginError">{% if form.non_field_errors %}{{ form.non_field_errors|striptags }}{% endif %}</div>
           <button class="btn btn--primary btn--full" type="submit">Login</button>
         </form>
 
         <div class="auth__links">
-          <a href="forgot.html">Forgot password?</a>
-          <a href="signup.html">Create account</a>
+          <a href="{% url 'customers:password_reset' %}">Forgot password?</a>
+          <a href="{% url 'customers:signup' %}">Create account</a>
         </div>
       </div>
     </div>
@@ -46,6 +51,5 @@
   <div id="appFooter"></div>
 
   <script src="{% static 'js/main.js' %}"></script>
-  <script src="{% static 'js/login.js' %}"></script>
 </body>
 </html>

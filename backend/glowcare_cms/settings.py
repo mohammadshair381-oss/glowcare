@@ -37,6 +37,7 @@ INSTALLED_APPS = [
 
   "apps.catalog.apps.CatalogConfig",
   "apps.cms.apps.CmsConfig",
+  "apps.customers.apps.CustomersConfig",
   "apps.dashboard.apps.DashboardConfig",
   "apps.api.apps.ApiConfig",
 ]
@@ -97,6 +98,11 @@ AUTH_PASSWORD_VALIDATORS = [
   {"NAME": "django.contrib.auth.password_validation.NumericPasswordValidator"},
 ]
 
+AUTHENTICATION_BACKENDS = [
+  "apps.customers.auth_backend.EmailOrUsernameBackend",
+  "django.contrib.auth.backends.ModelBackend",
+]
+
 LANGUAGE_CODE = "en-us"
 TIME_ZONE = "Asia/Kolkata"
 USE_I18N = True
@@ -122,6 +128,18 @@ DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
 LOGIN_URL = "dashboard:login"
 LOGIN_REDIRECT_URL = "dashboard:home"
 LOGOUT_REDIRECT_URL = "dashboard:login"
+
+DEFAULT_FROM_EMAIL = env("DEFAULT_FROM_EMAIL", default="no-reply@glowcare.local")
+# Password reset emails use console backend by default in dev; set EMAIL_BACKEND/SMTP env vars for production.
+EMAIL_BACKEND = env(
+  "EMAIL_BACKEND",
+  default=("django.core.mail.backends.console.EmailBackend" if DEBUG else "django.core.mail.backends.smtp.EmailBackend"),
+)
+EMAIL_HOST = env("EMAIL_HOST", default="")
+EMAIL_PORT = env("EMAIL_PORT", default=587)
+EMAIL_HOST_USER = env("EMAIL_HOST_USER", default="")
+EMAIL_HOST_PASSWORD = env("EMAIL_HOST_PASSWORD", default="")
+EMAIL_USE_TLS = env("EMAIL_USE_TLS", default=True)
 
 REST_FRAMEWORK = {
   "DEFAULT_FILTER_BACKENDS": ["django_filters.rest_framework.DjangoFilterBackend", "rest_framework.filters.OrderingFilter"],

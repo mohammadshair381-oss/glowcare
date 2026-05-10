@@ -13,6 +13,7 @@ urlpatterns = [
 
   path("dashboard/", include(("apps.dashboard.urls", "dashboard"), namespace="dashboard")),
   path("api/v1/", include(("apps.api.urls", "api"), namespace="api")),
+  path("", include(("apps.customers.urls", "customers"), namespace="customers")),
 
   # Public frontend entry (renders existing premium UI, content hydrated via API)
   path("", HomePageView.as_view(), name="public_home"),
@@ -25,15 +26,7 @@ urlpatterns = [
   path("contact.html", TemplateView.as_view(template_name="public/contact.html"), name="public_contact"),
   path("info.html", TemplateView.as_view(template_name="public/info.html"), name="public_info"),
 
-  path("login.html", TemplateView.as_view(template_name="public/login.html"), name="public_login"),
-  path("signup.html", TemplateView.as_view(template_name="public/signup.html"), name="public_signup"),
-  path("forgot.html", TemplateView.as_view(template_name="public/forgot.html"), name="public_forgot"),
-  path("account.html", TemplateView.as_view(template_name="public/account.html"), name="public_account"),
-
   path("cart.html", TemplateView.as_view(template_name="public/cart.html"), name="public_cart"),
-  path("checkout.html", TemplateView.as_view(template_name="public/checkout.html"), name="public_checkout"),
-  path("payment.html", TemplateView.as_view(template_name="public/payment.html"), name="public_payment"),
-  path("success.html", TemplateView.as_view(template_name="public/success.html"), name="public_success"),
   path("wishlist.html", TemplateView.as_view(template_name="public/wishlist.html"), name="public_wishlist"),
 ]
 

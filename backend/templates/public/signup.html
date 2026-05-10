@@ -5,42 +5,53 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Sign up | GlowCare</title>
-  <meta name="description" content="Sign up - GlowCare frontend-only demo store.">
+  <meta name="description" content="Create a GlowCare account.">
   <meta name="gc-static-base" content="{% static '' %}">
   <link rel="stylesheet" href="{% static 'css/style.css' %}">
   <link rel="stylesheet" href="{% static 'css/navbar.css' %}">
   <link rel="stylesheet" href="{% static 'css/login.css' %}">
   <link rel="stylesheet" href="{% static 'css/responsive.css' %}">
 </head>
-<body>
+<body data-authenticated="{% if request.user.is_authenticated %}true{% else %}false{% endif %}"
+      data-user-id="{% if request.user.is_authenticated %}{{ request.user.id }}{% endif %}"
+      data-user-email="{% if request.user.is_authenticated %}{{ request.user.email }}{% endif %}"
+      data-user-name="{% if request.user.is_authenticated %}{{ request.user.first_name|default:request.user.get_username }}{% endif %}"
+      data-user-role="{% if request.user.is_authenticated %}{% if request.user.is_staff %}admin{% else %}customer{% endif %}{% endif %}">
   <div id="appNavbar"></div>
 
   <main class="auth" id="signupPage">
     <div class="container">
       <div class="panel auth__wrap">
         <h1 class="auth__title">Create account</h1>
-        <p class="auth__sub">Frontend-only demo signup using localStorage.</p>
+        <p class="auth__sub">Create your account to continue.</p>
 
-        <form id="signupForm" class="auth__form">
+        <form id="signupForm" class="auth__form" method="post" action="{% url 'customers:signup' %}">
+          {% csrf_token %}
+          {% if next %}<input type="hidden" name="next" value="{{ next }}">{% endif %}
           <div class="field">
             <label class="label" for="name">Name</label>
-            <input class="input" id="name" autocomplete="name">
+            <input class="input" id="name" name="name" autocomplete="name" required value="{{ form.name.value|default_if_none:'' }}">
           </div>
           <div class="field">
             <label class="label" for="email">Email</label>
-            <input class="input" id="email" autocomplete="email">
+            <input class="input" id="email" name="email" type="email" autocomplete="email" required value="{{ form.email.value|default_if_none:'' }}">
           </div>
           <div class="field">
             <label class="label" for="password">Password</label>
-            <input class="input" id="password" type="password" autocomplete="new-password">
+            <input class="input" id="password" name="password" type="password" autocomplete="new-password" required>
           </div>
-          <div class="error" id="signupError"></div>
+          <div class="error" id="signupError">
+            {% if form.errors %}
+              {% for err in form.non_field_errors %}{{ err }}{% endfor %}
+              {% for field in form %}{% for err in field.errors %}{{ err }}{% endfor %}{% endfor %}
+            {% endif %}
+          </div>
           <button class="btn btn--primary btn--full" type="submit">Sign up</button>
         </form>
 
         <div class="auth__links">
-          <a href="login.html">Have an account?</a>
-          <a href="forgot.html">Reset password</a>
+          <a href="{% url 'customers:login' %}">Have an account?</a>
+          <a href="{% url 'customers:password_reset' %}">Reset password</a>
         </div>
       </div>
     </div>
@@ -49,6 +60,5 @@
   <div id="appFooter"></div>
 
   <script src="{% static 'js/main.js' %}"></script>
-  <script src="{% static 'js/signup.js' %}"></script>
 </body>
 </html>
