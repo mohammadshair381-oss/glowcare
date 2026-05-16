@@ -869,7 +869,7 @@
 
   function panelLogos(state) {
     const wrap = document.createElement("div");
-    wrap.appendChild(rowLabel("Featured in / media logos. Drag to reorder."));
+    wrap.appendChild(rowLabel("Homepage brand showcase. Drag to reorder."));
 
     const items = Array.isArray(state.logos) ? state.logos.slice().sort((a, b) => (a.sortOrder ?? 0) - (b.sortOrder ?? 0)) : [];
     if (!ui.logoId && items[0]?.id) ui.logoId = items[0].id;
@@ -910,6 +910,7 @@
     const cur = items.find((x) => String(x.id) === String(ui.logoId));
     if (cur) {
       wrap.appendChild(inputRow("Name", cur.name || "", { onInput: (v) => window.GCEditor.patch((s) => { const x=(s.logos||[]).find((a)=>a.id===cur.id); if(x) x.name=v; }) }));
+      wrap.appendChild(inputRow("URL (optional)", cur.href || "", { onInput: (v) => window.GCEditor.patch((s) => { const x=(s.logos||[]).find((a)=>a.id===cur.id); if(x) x.href=v; }) }));
       wrap.appendChild(
         button(cur.logo?.url ? "Change logo image" : "Pick logo image", "e-btn--ghost", () =>
           window.GCMediaLibrary.open({
@@ -930,7 +931,7 @@
       );
     }
 
-    return acc("logos", "Featured Logos", "Media mentions", wrap);
+    return acc("logos", "Brand Showcase", "Homepage brand logos", wrap);
   }
 
   function panelTestimonials(state) {

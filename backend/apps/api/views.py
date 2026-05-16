@@ -158,7 +158,10 @@ class HomepageView(APIView):
     if app_banner:
       app_payload = {"title": app_banner.title, "subtitle": app_banner.subtitle, "stores": app_banner.stores or [], "bg": app_banner.bg or ""}
 
-    logos = [{"name": l.name, "logo": (l.logo.file.url if l.logo_id else "")} for l in FeaturedLogo.objects.filter(homepage=home, enabled=True).order_by("sort_order", "id")]
+    logos = [
+      {"name": l.name, "logo": (l.logo.file.url if l.logo_id else ""), "href": (l.href or "")}
+      for l in FeaturedLogo.objects.filter(homepage=home, enabled=True).order_by("sort_order", "id")
+    ]
 
     testimonials = []
     for t in Testimonial.objects.filter(homepage=home, enabled=True).order_by("sort_order", "id"):
@@ -191,7 +194,7 @@ class HomepageView(APIView):
       "hero": {"autoplayMs": hero_autoplay_ms, "slides": slides},
       "promoStrip": promo_payload,
       "appBanner": app_payload,
-      "logos": {"items": [l["name"] for l in logos], "media": logos},
+      "logos": {"items": [l["name"] for l in logos], "media": logos, "links": {l["name"]: l["href"] for l in logos if l.get("href")}},
       "testimonials": {"items": testimonials},
       "productSections": product_sections,
       # Additional keys can be added without breaking frontend

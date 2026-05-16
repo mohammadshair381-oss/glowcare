@@ -1,7 +1,7 @@
 {% extends "dashboard/base.html" %}
 {% block title %}Edit Logo — GlowCare CMS{% endblock %}
-{% block header %}Edit Featured Logo{% endblock %}
-{% block subheader %}Name, order, enable and media id{% endblock %}
+{% block header %}Edit Brand Showcase Item{% endblock %}
+{% block subheader %}Name, optional URL, order, visibility and media id{% endblock %}
 
 {% block content %}
   <section class="dpanel">
@@ -22,6 +22,11 @@
         <div class="drow2"><label class="dlabel">Order</label><input class="dinput" name="sort_order" value="{{ l.sort_order }}"></div>
       </div>
       <div class="drow2"><label class="dlabel">Name</label><input class="dinput" name="name" value="{{ l.name }}"></div>
+      <div class="drow2">
+        <label class="dlabel">Optional URL</label>
+        <input class="dinput" name="href" value="{{ l.href }}" placeholder="https://brand.com or /shop.html?brand=...">
+        <div class="dhelp">If set, the logo becomes clickable on homepage.</div>
+      </div>
       <div class="drow2"><label class="dlabel">Logo media asset id</label><input class="dinput" name="logo_id" value="{% if l.logo_id %}{{ l.logo_id }}{% endif %}"></div>
       <div class="dactions2"><button class="dbtn dbtn--primary" type="submit">Save</button></div>
     </form>

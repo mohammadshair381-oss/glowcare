@@ -1,0 +1,90 @@
+{% extends "dashboard/base.html" %}
+{% block title %}Customer {{ customer.get_username }} — GlowCare CMS{% endblock %}
+{% block header %}Customer{% endblock %}
+{% block subheader %}Order history and saved addresses{% endblock %}
+
+{% block content %}
+  <section class="dpanel">
+    <div class="dpanel__head">
+      <div>
+        <div class="dpanel__title">{{ customer.get_username }}</div>
+        <div class="dpanel__sub">{{ customer.email|default:"No email on file" }}</div>
+      </div>
+      <div class="dpanel__actions">
+        <a class="dbtn" href="{% url 'dashboard:customers' %}">Back to customers</a>
+      </div>
+    </div>
+
+    <div class="dgrid2" style="margin-top:12px;">
+      <div class="dstat">
+        <div class="dstat__k">Joined</div>
+        <div class="dstat__v" style="font-size:22px;">{{ customer.date_joined|date:"Y-m-d" }}</div>
+        <div class="dstat__s">Account created</div>
+      </div>
+      <div class="dstat">
+        <div class="dstat__k">Last login</div>
+        <div class="dstat__v" style="font-size:22px;">{% if customer.last_login %}{{ customer.last_login|date:"Y-m-d" }}{% else %}—{% endif %}</div>
+        <div class="dstat__s">May be empty for new users</div>
+      </div>
+    </div>
+
+    <div class="dpanel" style="margin-top:14px;">
+      <div class="dpanel__head">
+        <div>
+          <div class="dpanel__title">Saved addresses</div>
+          <div class="dpanel__sub">Latest addresses collected during checkout</div>
+        </div>
+      </div>
+      {% for a in addresses %}
+        <div class="drow" style="grid-template-columns: 1fr;">
+          <div>
+            <div style="font-weight:950;">{{ a.full_name }}</div>
+            <div class="dhelp" style="margin-top:6px;">
+              {{ a.phone }}{% if a.email %} • {{ a.email }}{% endif %}<br>
+              {{ a.address1 }}{% if a.address2 %}, {{ a.address2 }}{% endif %}<br>
+              {{ a.city }}, {{ a.state }} {{ a.pincode }}
+            </div>
+          </div>
+        </div>
+      {% empty %}
+        <div class="dempty">
+          <div class="dempty__title">No addresses yet</div>
+          <div class="dhelp">This customer hasn’t completed checkout.</div>
+        </div>
+      {% endfor %}
+    </div>
+
+    <div class="dpanel" style="margin-top:14px;">
+      <div class="dpanel__head">
+        <div>
+          <div class="dpanel__title">Recent orders</div>
+          <div class="dpanel__sub">Last 50 orders for this customer</div>
+        </div>
+      </div>
+      <div class="dtablewrap">
+        <div class="dtable dtable--wide">
+          <div class="dthead" style="grid-template-columns: 1.4fr 1.2fr .8fr 1fr;">
+            <div>Order</div>
+            <div>Date</div>
+            <div>Total</div>
+            <div>Status</div>
+          </div>
+          {% for o in orders %}
+            <div class="drow" style="grid-template-columns: 1.4fr 1.2fr .8fr 1fr;">
+              <div><span class="dpill"><a href="{% url 'dashboard:order_detail' o.public_id %}">{{ o.public_id }}</a></span></div>
+              <div class="dhelp" style="margin:0;">{{ o.created_at|date:"Y-m-d H:i" }}</div>
+              <div>₹{{ o.total }}</div>
+              <div class="dhelp" style="margin:0;">{{ o.get_payment_status_display }} • {{ o.get_fulfillment_status_display }}</div>
+            </div>
+          {% empty %}
+            <div class="dempty">
+              <div class="dempty__title">No orders yet</div>
+              <div class="dhelp">Once this customer places an order, it will show up here.</div>
+            </div>
+          {% endfor %}
+        </div>
+      </div>
+    </div>
+  </section>
+{% endblock %}
+

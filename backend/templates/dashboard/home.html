@@ -1,14 +1,32 @@
 {% extends "dashboard/base.html" %}
-{% block title %}Dashboard â€” GlowCare CMS{% endblock %}
+{% block title %}Dashboard — GlowCare CMS{% endblock %}
 {% block header %}Dashboard{% endblock %}
-{% block subheader %}Content, products & homepage controls{% endblock %}
+{% block subheader %}CMS controls + ecommerce operations overview{% endblock %}
 
 {% block content %}
   <section class="dgrid">
     <div class="dstat">
-      <div class="dstat__k">Products</div>
+      <div class="dstat__k">Total products</div>
       <div class="dstat__v">{{ counts.products }}</div>
       <div class="dstat__s">Catalog items</div>
+    </div>
+    <div class="dstat">
+      <div class="dstat__k">Total orders</div>
+      <div class="dstat__v">{{ commerce.totals.orders }}</div>
+      <div class="dstat__s">All time</div>
+    </div>
+    <div class="dstat">
+      <div class="dstat__k">Low stock</div>
+      <div class="dstat__v">{{ commerce.totals.low_stock }}</div>
+      <div class="dstat__s">Variants at/below threshold</div>
+    </div>
+  </section>
+
+  <section class="dgrid" style="margin-top:12px;">
+    <div class="dstat">
+      <div class="dstat__k">Revenue</div>
+      <div class="dstat__v" style="font-size:28px;">₹{{ commerce.totals.revenue }}</div>
+      <div class="dstat__s">Based on order totals</div>
     </div>
     <div class="dstat">
       <div class="dstat__k">Hero slides</div>
@@ -16,7 +34,7 @@
       <div class="dstat__s">Homepage carousel</div>
     </div>
     <div class="dstat">
-      <div class="dstat__k">Sections</div>
+      <div class="dstat__k">Homepage sections</div>
       <div class="dstat__v">{{ counts.sections }}</div>
       <div class="dstat__s">Order + visibility</div>
     </div>
@@ -26,20 +44,127 @@
     <div class="dpanel__head">
       <div>
         <div class="dpanel__title">Quick actions</div>
-        <div class="dpanel__sub">Most-used CMS areas</div>
+        <div class="dpanel__sub">Common tasks for day-to-day operations</div>
       </div>
     </div>
     <div class="dactions">
+      <a class="daction" href="{% url 'dashboard:orders' %}">Orders</a>
+      <a class="daction" href="{% url 'dashboard:customers' %}">Customers</a>
+      <a class="daction" href="{% url 'dashboard:inventory' %}">Inventory</a>
+      <a class="daction" href="{% url 'dashboard:products' %}">Products</a>
       <a class="daction" href="{% url 'dashboard:homepage_builder' %}">Homepage builder</a>
       <a class="daction" href="{% url 'dashboard:homepage_editor' %}">Visual editor</a>
-      <a class="daction" href="{% url 'dashboard:hero_slides' %}">Hero slides</a>
-      <a class="daction" href="{% url 'dashboard:products' %}">Products</a>
       <a class="daction" href="{% url 'dashboard:media' %}">Media library</a>
       <a class="daction" href="{% url 'dashboard:assets' %}">Manage assets</a>
       <a class="daction" href="{% url 'dashboard:navigation' %}">Navbar</a>
-      <a class="daction" href="{% url 'dashboard:footer' %}">Footer</a>
       <a class="daction" href="{% url 'dashboard:theme' %}">Theme</a>
       <a class="daction" href="{% url 'dashboard:announcement' %}">Announcement</a>
+      <a class="daction" href="{% url 'dashboard:footer' %}">Footer</a>
+    </div>
+  </section>
+
+  <section class="dpanel">
+    <div class="dpanel__head">
+      <div>
+        <div class="dpanel__title">Recent customers</div>
+        <div class="dpanel__sub">Customers with recent orders</div>
+      </div>
+      <div class="dpanel__actions">
+        <a class="dbtn" href="{% url 'dashboard:customers' %}">All customers</a>
+      </div>
+    </div>
+
+    <div class="dtablewrap">
+      <div class="dtable dtable--wide">
+        <div class="dthead" style="grid-template-columns: 1.2fr 1.6fr 1.2fr .8fr;">
+          <div>Customer</div>
+          <div>Email</div>
+          <div>Last order</div>
+          <div></div>
+        </div>
+        {% for c in commerce.recent_customers %}
+          <div class="drow" style="grid-template-columns: 1.2fr 1.6fr 1.2fr .8fr;">
+            <div style="font-weight:900;">{{ c.get_username }}</div>
+            <div class="dhelp" style="margin:0;">{{ c.email|default:"—" }}</div>
+            <div class="dhelp" style="margin:0;">{{ c.last_order_at|date:"Y-m-d H:i" }}</div>
+            <div><a class="dbtn" href="{% url 'dashboard:customer_detail' c.id %}">View</a></div>
+          </div>
+        {% empty %}
+          <div class="dempty">
+            <div class="dempty__title">No recent customers</div>
+            <div class="dhelp">This section will populate as orders come in.</div>
+          </div>
+        {% endfor %}
+      </div>
+    </div>
+  </section>
+
+  <section class="dpanel">
+    <div class="dpanel__head">
+      <div>
+        <div class="dpanel__title">Recent orders</div>
+        <div class="dpanel__sub">Quickly jump into order detail and status management</div>
+      </div>
+      <div class="dpanel__actions">
+        <a class="dbtn" href="{% url 'dashboard:orders' %}">All orders</a>
+      </div>
+    </div>
+
+    <div class="dtablewrap">
+      <div class="dtable dtable--wide">
+        <div class="dthead" style="grid-template-columns: 1.4fr 1.2fr 1.4fr .8fr 1.2fr;">
+          <div>Order</div>
+          <div>Date</div>
+          <div>Customer</div>
+          <div>Total</div>
+          <div>Status</div>
+        </div>
+        {% for o in commerce.recent_orders %}
+          <div class="drow" style="grid-template-columns: 1.4fr 1.2fr 1.4fr .8fr 1.2fr;">
+            <div><span class="dpill"><a href="{% url 'dashboard:order_detail' o.public_id %}">{{ o.public_id }}</a></span></div>
+            <div class="dhelp" style="margin:0;">{{ o.created_at|date:"Y-m-d H:i" }}</div>
+            <div class="dhelp" style="margin:0;"><a href="{% url 'dashboard:customer_detail' o.user_id %}">{{ o.user.get_username }}</a></div>
+            <div>₹{{ o.total }}</div>
+            <div class="dhelp" style="margin:0;">{{ o.get_payment_status_display }} • {{ o.get_fulfillment_status_display }}</div>
+          </div>
+        {% empty %}
+          <div class="dempty">
+            <div class="dempty__title">No orders yet</div>
+            <div class="dhelp">Orders will appear here after customers place them via checkout.</div>
+          </div>
+        {% endfor %}
+      </div>
+    </div>
+  </section>
+
+  <section class="dpanel">
+    <div class="dpanel__head">
+      <div>
+        <div class="dpanel__title">Product performance</div>
+        <div class="dpanel__sub">Top items by revenue (last 30 days)</div>
+      </div>
+    </div>
+
+    <div class="dtablewrap">
+      <div class="dtable dtable--wide">
+        <div class="dthead" style="grid-template-columns: 2fr .8fr 1fr;">
+          <div>Product</div>
+          <div>Qty</div>
+          <div>Revenue</div>
+        </div>
+        {% for it in commerce.top_items %}
+          <div class="drow" style="grid-template-columns: 2fr .8fr 1fr;">
+            <div style="font-weight:900;">{{ it.product_name|default:"(unnamed)" }}</div>
+            <div>{{ it.qty|default:0 }}</div>
+            <div>₹{{ it.revenue|default:0 }}</div>
+          </div>
+        {% empty %}
+          <div class="dempty">
+            <div class="dempty__title">Not enough data yet</div>
+            <div class="dhelp">Once orders come in, top products will be shown here.</div>
+          </div>
+        {% endfor %}
+      </div>
     </div>
   </section>
 {% endblock %}

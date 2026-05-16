@@ -1,6 +1,7 @@
 from django.urls import include, path
 
 from .views_auth import DashboardLoginView, dashboard_logout
+from .views_commerce import CustomerDetailView, CustomersListView, InventoryListView, OrderDetailView, OrdersListView
 from .views_dashboard import (
   AnnouncementEditView,
   DashboardHomeView,
@@ -48,6 +49,13 @@ urlpatterns = [
   path("logout/", dashboard_logout, name="logout"),
 
   path("", DashboardHomeView.as_view(), name="home"),
+
+  path("orders/", OrdersListView.as_view(), name="orders"),
+  path("orders/<uuid:order_id>/", OrderDetailView.as_view(), name="order_detail"),
+  path("customers/", CustomersListView.as_view(), name="customers"),
+  path("customers/<int:user_id>/", CustomerDetailView.as_view(), name="customer_detail"),
+  path("inventory/", InventoryListView.as_view(), name="inventory"),
+
   path("preview/", PreviewHomeView.as_view(), name="preview_home"),
   path("homepage/", HomepageBuilderView.as_view(), name="homepage_builder"),
   path("homepage/editor/", HomepageVisualEditorView.as_view(), name="homepage_editor"),

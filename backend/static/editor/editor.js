@@ -155,7 +155,14 @@
             bg: s.appBanner.bg || "",
           }
         : null,
-      logos: { media: Array.isArray(s?.logos) ? s.logos.filter((x) => x.enabled !== false).sort((a, b) => (a.sortOrder ?? 0) - (b.sortOrder ?? 0)).map((x) => ({ name: x.name || "", logo: x.logo?.url || "" })) : [] },
+      logos: {
+        media: Array.isArray(s?.logos)
+          ? s.logos
+              .filter((x) => x.enabled !== false)
+              .sort((a, b) => (a.sortOrder ?? 0) - (b.sortOrder ?? 0))
+              .map((x) => ({ name: x.name || "", logo: x.logo?.url || "", href: x.href || "" }))
+          : [],
+      },
       testimonials: {
         items: Array.isArray(s?.testimonials)
           ? s.testimonials

@@ -243,6 +243,7 @@ class FeaturedLogo(TimeStampedModel):
   enabled = models.BooleanField(default=True)
   sort_order = models.PositiveIntegerField(default=0)
   name = models.CharField(max_length=40)
+  href = models.CharField(max_length=240, blank=True, default="")
   logo = models.ForeignKey(MediaAsset, null=True, blank=True, on_delete=models.SET_NULL, related_name="featured_logos")
 
   class Meta:

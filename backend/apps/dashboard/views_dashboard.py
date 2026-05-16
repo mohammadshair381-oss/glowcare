@@ -1,6 +1,6 @@
 from django.utils.decorators import method_decorator
 from django.views.decorators.clickjacking import xframe_options_sameorigin
-from django.contrib.auth.mixins import LoginRequiredMixin, UserPassesTestMixin
+from django.contrib.auth.mixins import LoginRequiredMixin
 from django.db import transaction
 from django.db.models import F, Q
 from django.http import HttpRequest, HttpResponse, JsonResponse
@@ -11,6 +11,8 @@ from django.views import View
 from django.views.generic import TemplateView
 
 from django.core.files.base import ContentFile
+from django.core.paginator import Paginator
+from urllib.parse import urlencode
 
 from apps.catalog.models import Brand, Category, MediaAsset, Product, ProductImage, SubCategory, Variant
 from apps.catalog.media_services import create_media_asset, media_asset_usage, search_assets_queryset
@@ -44,19 +46,7 @@ from .forms import (
   VariantForm,
 )
 
-
-class StaffRequiredMixin(UserPassesTestMixin):
-  def test_func(self):
-    u = self.request.user
-    return bool(u and u.is_authenticated and u.is_staff)
-
-  def handle_no_permission(self):
-    if not self.request.user.is_authenticated:
-      return super().handle_no_permission()
-    from django.contrib.auth import logout
-
-    logout(self.request)
-    return redirect("dashboard:login")
+from .mixins import StaffRequiredMixin
 
 
 class DashboardHomeView(LoginRequiredMixin, StaffRequiredMixin, TemplateView):
@@ -69,6 +59,9 @@ class DashboardHomeView(LoginRequiredMixin, StaffRequiredMixin, TemplateView):
       "hero_slides": HeroSlide.objects.count(),
       "sections": HomepageSection.objects.count(),
     }
+    from .views_commerce import dashboard_commerce_snapshot
+
+    ctx["commerce"] = dashboard_commerce_snapshot()
     return ctx
 
 
@@ -377,6 +370,7 @@ class FeaturedLogoEditView(LoginRequiredMixin, StaffRequiredMixin, View):
     l.enabled = request.POST.get("enabled") == "1"
     l.sort_order = int(request.POST.get("sort_order") or 0)
     l.name = (request.POST.get("name") or "")[:40]
+    l.href = (request.POST.get("href") or "")[:240]
     logo_id = request.POST.get("logo_id") or ""
     if logo_id.isdigit():
       l.logo_id = int(logo_id)
@@ -601,7 +595,17 @@ class ProductListView(LoginRequiredMixin, StaffRequiredMixin, TemplateView):
     if q:
       qs = qs.filter(Q(name__icontains=q) | Q(sku__icontains=q) | Q(brand__icontains=q) | Q(brand_ref__name__icontains=q))
     ctx["q"] = q
-    products = list(qs[:200])
+
+    paginator = Paginator(qs, 25)
+    page_obj = paginator.get_page(self.request.GET.get("page") or 1)
+    products = list(page_obj.object_list)
+
+    qd = self.request.GET.copy()
+    if "page" in qd:
+      qd.pop("page", None)
+    qs_base = urlencode([(k, v) for k, vals in qd.lists() for v in vals if v is not None and v != ""])
+    ctx["page_obj"] = page_obj
+    ctx["qs_base"] = f"&{qs_base}" if qs_base else ""
     # low stock flag (safe + small N)
     low_ids = set(
       Variant.objects.filter(product_id__in=[p.id for p in products], is_active=True, track_inventory=True)

@@ -1,0 +1,113 @@
+{% extends "dashboard/base.html" %}
+{% block title %}Order {{ order.public_id }} — GlowCare CMS{% endblock %}
+{% block header %}Order{% endblock %}
+{% block subheader %}Details and status management{% endblock %}
+
+{% block content %}
+  <section class="dpanel">
+    <div class="dpanel__head">
+      <div>
+        <div class="dpanel__title">Order <span class="dpill">{{ order.public_id }}</span></div>
+        <div class="dpanel__sub">Customer: <a href="{% url 'dashboard:customer_detail' order.user_id %}">{{ order.user.get_username }}</a> • {{ order.user.email }}</div>
+      </div>
+      <div class="dpanel__actions">
+        <a class="dbtn" href="{% url 'dashboard:orders' %}">Back to orders</a>
+      </div>
+    </div>
+
+    {% if saved %}
+      <div class="dalert" style="border-color: rgba(57,211,193,.35); background: rgba(57,211,193,.12); margin-top:12px;">Saved changes.</div>
+    {% endif %}
+
+    <div class="dgrid2" style="margin-top:12px;">
+      <div class="dstat">
+        <div class="dstat__k">Total</div>
+        <div class="dstat__v" style="font-size:26px;">₹{{ order.total }}</div>
+        <div class="dstat__s">Placed {{ order.created_at|date:"Y-m-d H:i" }}</div>
+      </div>
+      <div class="dstat">
+        <div class="dstat__k">Items</div>
+        <div class="dstat__v" style="font-size:26px;">{{ order.items.count }}</div>
+        <div class="dstat__s">Lines in this order</div>
+      </div>
+    </div>
+
+    <form method="post" class="dform2">
+      {% csrf_token %}
+      <div class="dgrid2">
+        <div class="drow2">
+          <div class="dlabel">Payment status</div>
+          <select class="dinput" name="payment_status">
+            {% for val,label in payment_choices %}
+              <option value="{{ val }}" {% if order.payment_status == val %}selected{% endif %}>{{ label }}</option>
+            {% endfor %}
+          </select>
+          <div class="dhelp">Set to “Paid” only after confirmation from the payment provider.</div>
+        </div>
+        <div class="drow2">
+          <div class="dlabel">Fulfillment status</div>
+          <select class="dinput" name="fulfillment_status">
+            {% for val,label in fulfillment_choices %}
+              <option value="{{ val }}" {% if order.fulfillment_status == val %}selected{% endif %}>{{ label }}</option>
+            {% endfor %}
+          </select>
+          <div class="dhelp">Use “Processing” while packing; “Shipped” when handed to courier.</div>
+        </div>
+      </div>
+      <div class="dactions2">
+        <button class="dbtn dbtn--primary" type="submit">Save changes</button>
+      </div>
+    </form>
+
+    <div class="dpanel" style="margin-top:14px;">
+      <div class="dpanel__head">
+        <div>
+          <div class="dpanel__title">Ship to</div>
+          <div class="dpanel__sub">Customer address used for this order</div>
+        </div>
+      </div>
+      <div class="drow" style="grid-template-columns: 1fr;">
+        <div>
+          <div style="font-weight:950;">{{ order.shipping_address.full_name }}</div>
+          <div class="dhelp" style="margin-top:6px;">
+            {{ order.shipping_address.phone }}{% if order.shipping_address.email %} • {{ order.shipping_address.email }}{% endif %}<br>
+            {{ order.shipping_address.address1 }}{% if order.shipping_address.address2 %}, {{ order.shipping_address.address2 }}{% endif %}<br>
+            {{ order.shipping_address.city }}, {{ order.shipping_address.state }} {{ order.shipping_address.pincode }}
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="dpanel" style="margin-top:14px;">
+      <div class="dpanel__head">
+        <div>
+          <div class="dpanel__title">Items</div>
+          <div class="dpanel__sub">What the customer purchased</div>
+        </div>
+      </div>
+
+      <div class="dtablewrap">
+        <div class="dtable dtable--wide">
+          <div class="dthead" style="grid-template-columns: 2fr 1fr 1fr 1fr;">
+            <div>Product</div>
+            <div>Variant</div>
+            <div>Qty</div>
+            <div>Line total</div>
+          </div>
+          {% for it in order.items.all %}
+            <div class="drow" style="grid-template-columns: 2fr 1fr 1fr 1fr;">
+              <div>
+                <div style="font-weight:900;">{{ it.product_name|default:it.product.name }}</div>
+                <div class="dhelp" style="margin-top:3px;">SKU: {{ it.product.sku }}</div>
+              </div>
+              <div class="dhelp" style="margin:0;">{{ it.variant_sku }}</div>
+              <div>{{ it.qty }}</div>
+              <div>₹{{ it.line_total }}</div>
+            </div>
+          {% endfor %}
+        </div>
+      </div>
+    </div>
+  </section>
+{% endblock %}
+

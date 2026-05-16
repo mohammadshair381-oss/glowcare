@@ -1,0 +1,57 @@
+{% extends "dashboard/base.html" %}
+{% block title %}Customers — GlowCare CMS{% endblock %}
+{% block header %}Customers{% endblock %}
+{% block subheader %}Search customers and view order history{% endblock %}
+
+{% block content %}
+  <section class="dpanel">
+    <div class="dpanel__head">
+      <div>
+        <div class="dpanel__title">Customer management</div>
+        <div class="dpanel__sub">Search by username, name, or email</div>
+      </div>
+      <div class="dpanel__actions">
+        <a class="dbtn" href="{% url 'dashboard:customers' %}">Reset</a>
+      </div>
+    </div>
+
+    <form method="get" class="dfilters">
+      <input class="dinput" name="q" value="{{ q }}" placeholder="Search customers…">
+      <button class="dbtn" type="submit">Search</button>
+    </form>
+
+    <div class="dtablewrap">
+      <div class="dtable dtable--wide">
+        <div class="dthead" style="grid-template-columns: 1.2fr 1.6fr .8fr .9fr 1fr .7fr;">
+          <div>Customer</div>
+          <div>Email</div>
+          <div>Orders</div>
+          <div>Spent</div>
+          <div>Last order</div>
+          <div></div>
+        </div>
+        {% for c in customers %}
+          <div class="drow" style="grid-template-columns: 1.2fr 1.6fr .8fr .9fr 1fr .7fr;">
+            <div>
+              <div style="font-weight:900;">{{ c.get_username }}</div>
+              <div class="dhelp" style="margin-top:3px;">Joined {{ c.date_joined|date:"Y-m-d" }}</div>
+            </div>
+            <div class="dhelp" style="margin:0;">{{ c.email|default:"—" }}</div>
+            <div>{{ c.orders_count|default:0 }}</div>
+            <div>₹{{ c.total_spent|default:0 }}</div>
+            <div class="dhelp" style="margin:0;">{% if c.last_order_at %}{{ c.last_order_at|date:"Y-m-d H:i" }}{% else %}—{% endif %}</div>
+            <div><a class="dbtn" href="{% url 'dashboard:customer_detail' c.id %}">View</a></div>
+          </div>
+        {% empty %}
+          <div class="dempty">
+            <div class="dempty__title">No customers found</div>
+            <div class="dhelp">Try searching by email, or clear the search.</div>
+          </div>
+        {% endfor %}
+      </div>
+    </div>
+
+    {% include "dashboard/_pager.html" %}
+  </section>
+{% endblock %}
+

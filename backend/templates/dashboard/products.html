@@ -15,10 +15,11 @@
       </div>
     </div>
 
-    <form method="get" style="margin-top:12px; display:flex; gap:10px; flex-wrap:wrap;">
+    <form method="get" class="dfilters">
       <input class="dinput" name="q" value="{{ q }}" placeholder="Search by name, SKU, brand…">
       <button class="dbtn" type="submit">Search</button>
       <a class="dbtn" href="{% url 'dashboard:products' %}">Reset</a>
+      <div class="dhelp">Tip: use SKU when matching supplier sheets.</div>
     </form>
 
     <form method="post" style="margin-top:12px;">
@@ -35,44 +36,51 @@
         <div class="dhelp">Select products below, then apply.</div>
       </div>
 
-      <div class="dtable">
-        <div class="dthead" style="grid-template-columns: .4fr 1fr 2fr 1fr 1fr 1fr 1fr 1fr;">
-          <div></div>
-          <div>SKU</div>
-          <div>Name</div>
-          <div>Category</div>
-          <div>Status</div>
-          <div>Stock</div>
-          <div>Price</div>
-          <div></div>
-        </div>
-        {% for p in products %}
-          <div class="drow" style="grid-template-columns: .4fr 1fr 2fr 1fr 1fr 1fr 1fr 1fr;">
-            <div><input type="checkbox" name="ids" value="{{ p.id }}"></div>
-            <div>{{ p.sku }}</div>
-            <div>
-              {{ p.name }}
-              {% if p.brand_ref_id %}<div class="dhelp" style="margin-top:4px;">{{ p.brand_ref.name }}</div>{% endif %}
-            </div>
-            <div>
-              {{ p.category.slug }}
-              {% if p.subcategory_id %}<div class="dhelp" style="margin-top:4px;">{{ p.subcategory.slug }}</div>{% endif %}
-            </div>
-            <div>
-              {% if p.is_published %}<span class="dpill dpill--ok">Published</span>{% else %}<span class="dpill">Hidden</span>{% endif %}
-              {% if not p.is_active %}<span class="dpill" style="margin-left:6px;">Inactive</span>{% endif %}
-            </div>
-            <div>
-              {% if p.id in low_ids %}<span class="dpill" style="border-color: rgba(255,46,122,.30); background: rgba(255,46,122,.10);">Low</span>{% else %}<span class="dpill">OK</span>{% endif %}
-            </div>
-            <div>₹{{ p.price }}</div>
-            <div><a class="dbtn" href="{% url 'dashboard:product_edit' p.id %}">Edit</a></div>
+      <div class="dtablewrap">
+        <div class="dtable dtable--wide">
+          <div class="dthead" style="grid-template-columns: .4fr 1fr 2fr 1fr 1fr 1fr 1fr 1fr;">
+            <div></div>
+            <div>SKU</div>
+            <div>Name</div>
+            <div>Category</div>
+            <div>Status</div>
+            <div>Stock</div>
+            <div>Price</div>
+            <div></div>
           </div>
-        {% empty %}
-          <div class="dmuted">No products found.</div>
-        {% endfor %}
+          {% for p in products %}
+            <div class="drow" style="grid-template-columns: .4fr 1fr 2fr 1fr 1fr 1fr 1fr 1fr;">
+              <div><input type="checkbox" name="ids" value="{{ p.id }}"></div>
+              <div>{{ p.sku }}</div>
+              <div>
+                {{ p.name }}
+                {% if p.brand_ref_id %}<div class="dhelp" style="margin-top:4px;">{{ p.brand_ref.name }}</div>{% endif %}
+              </div>
+              <div>
+                {{ p.category.slug }}
+                {% if p.subcategory_id %}<div class="dhelp" style="margin-top:4px;">{{ p.subcategory.slug }}</div>{% endif %}
+              </div>
+              <div>
+                {% if p.is_published %}<span class="dpill dpill--ok">Published</span>{% else %}<span class="dpill">Hidden</span>{% endif %}
+                {% if not p.is_active %}<span class="dpill" style="margin-left:6px;">Inactive</span>{% endif %}
+              </div>
+              <div>
+                {% if p.id in low_ids %}<span class="dpill dpill--warn">Low</span>{% else %}<span class="dpill">OK</span>{% endif %}
+              </div>
+              <div>₹{{ p.price }}</div>
+              <div><a class="dbtn" href="{% url 'dashboard:product_edit' p.id %}">Edit</a></div>
+            </div>
+          {% empty %}
+            <div class="dempty">
+              <div class="dempty__title">No products found</div>
+              <div class="dhelp">Try a different search term, or create a new product.</div>
+            </div>
+          {% endfor %}
+        </div>
       </div>
     </form>
+
+    {% include "dashboard/_pager.html" %}
   </section>
 {% endblock %}
 

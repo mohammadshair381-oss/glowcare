@@ -1,0 +1,18 @@
+{% if page_obj and page_obj.paginator and page_obj.paginator.num_pages > 1 %}
+  <div class="dpager">
+    <div class="dhelp">Page {{ page_obj.number }} of {{ page_obj.paginator.num_pages }}</div>
+    <div class="dpager__btns">
+      {% if page_obj.has_previous %}
+        <a class="dbtn" href="?page={{ page_obj.previous_page_number }}{{ qs_base }}">Prev</a>
+      {% else %}
+        <span class="dbtn dbtn--disabled">Prev</span>
+      {% endif %}
+      {% if page_obj.has_next %}
+        <a class="dbtn" href="?page={{ page_obj.next_page_number }}{{ qs_base }}">Next</a>
+      {% else %}
+        <span class="dbtn dbtn--disabled">Next</span>
+      {% endif %}
+    </div>
+  </div>
+{% endif %}
+

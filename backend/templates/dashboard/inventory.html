@@ -1,0 +1,83 @@
+{% extends "dashboard/base.html" %}
+{% block title %}Inventory — GlowCare CMS{% endblock %}
+{% block header %}Inventory{% endblock %}
+{% block subheader %}Track stock, highlight low inventory, and update quantities{% endblock %}
+
+{% block content %}
+  <section class="dpanel">
+    <div class="dpanel__head">
+      <div>
+        <div class="dpanel__title">Inventory management</div>
+        <div class="dpanel__sub">Search by product name or variant SKU. Low-stock uses each variant’s threshold.</div>
+      </div>
+      <div class="dpanel__actions">
+        <a class="dbtn" href="{% url 'dashboard:inventory' %}">Reset</a>
+      </div>
+    </div>
+
+    <form method="get" class="dfilters">
+      <input class="dinput" name="q" value="{{ q }}" placeholder="Search inventory…">
+      <label class="dcheck">
+        <input type="checkbox" name="low" value="1" {% if low == "1" %}checked{% endif %}>
+        <span>Only low stock</span>
+      </label>
+      <button class="dbtn" type="submit">Filter</button>
+    </form>
+
+    <div class="dhelp" style="margin-top:10px;">Update stock safely: set the exact quantity, then save.</div>
+
+    <div class="dtablewrap">
+      <div class="dtable dtable--wide">
+        <div class="dthead" style="grid-template-columns: 1.6fr 1fr .7fr .9fr .9fr 1fr;">
+          <div>Variant</div>
+          <div>Product SKU</div>
+          <div>Status</div>
+          <div>Stock</div>
+          <div>Threshold</div>
+          <div>Update</div>
+        </div>
+        {% for v in variants %}
+          <div class="drow {% if v.id in low_variant_ids %}drow--low{% endif %}" style="grid-template-columns: 1.6fr 1fr .7fr .9fr .9fr 1fr;">
+            <div>
+              <div style="font-weight:900;">{{ v.product.name }}</div>
+              <div class="dhelp" style="margin-top:3px;">Variant: {{ v.sku }}{% if v.shade %} • {{ v.shade }}{% endif %}</div>
+            </div>
+            <div class="dhelp" style="margin:0;">{{ v.product.sku }}</div>
+            <div>
+              {% if v.is_active %}<span class="dpill dpill--ok">Active</span>{% else %}<span class="dpill">Inactive</span>{% endif %}
+            </div>
+            <div>
+              {% if v.id in low_variant_ids %}<span class="dpill dpill--warn">{{ v.stock }}</span>{% else %}<span class="dpill">{{ v.stock }}</span>{% endif %}
+            </div>
+            <div class="dhelp" style="margin:0;">{{ v.low_stock_threshold }}</div>
+            <div>
+              <form method="post" class="dinlineform">
+                {% csrf_token %}
+                <input type="hidden" name="variant_id" value="{{ v.id }}">
+                <input class="dinput dinput--sm" type="number" min="0" name="stock" value="{{ v.stock }}" aria-label="Stock">
+                <input class="dinput dinput--sm" type="number" min="0" name="low_stock_threshold" value="{{ v.low_stock_threshold }}" aria-label="Low stock threshold">
+                <label class="dcheck dcheck--sm">
+                  <input type="checkbox" name="track_inventory" {% if v.track_inventory %}checked{% endif %}>
+                  <span>Track</span>
+                </label>
+                <label class="dcheck dcheck--sm">
+                  <input type="checkbox" name="is_active" {% if v.is_active %}checked{% endif %}>
+                  <span>Active</span>
+                </label>
+                <button class="dbtn" type="submit">Save</button>
+              </form>
+            </div>
+          </div>
+        {% empty %}
+          <div class="dempty">
+            <div class="dempty__title">No variants found</div>
+            <div class="dhelp">Try a different search term, or clear filters.</div>
+          </div>
+        {% endfor %}
+      </div>
+    </div>
+
+    {% include "dashboard/_pager.html" %}
+  </section>
+{% endblock %}
+

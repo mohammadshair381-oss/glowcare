@@ -190,7 +190,7 @@ class EditorStateView(LoginRequiredMixin, StaffOnlyMixin, View):
         for t in Testimonial.objects.filter(homepage=home).order_by("sort_order", "id")
       ],
       "logos": [
-        {"id": l.id, "enabled": bool(l.enabled), "sortOrder": l.sort_order, "name": l.name, "logo": {"id": l.logo_id, "url": l.logo.file.url if l.logo_id else ""}}
+        {"id": l.id, "enabled": bool(l.enabled), "sortOrder": l.sort_order, "name": l.name, "href": l.href or "", "logo": {"id": l.logo_id, "url": l.logo.file.url if l.logo_id else ""}}
         for l in FeaturedLogo.objects.filter(homepage=home).order_by("sort_order", "id")
       ],
       "productSections": [
@@ -529,6 +529,8 @@ class FeaturedLogoUpdateView(LoginRequiredMixin, StaffOnlyMixin, View):
     data = _json(request.body)
     if "name" in data:
       l.name = str(data.get("name") or "")[:40]
+    if "href" in data:
+      l.href = str(data.get("href") or "")[:240]
     if "enabled" in data:
       l.enabled = bool(data.get("enabled"))
     if "sortOrder" in data:
