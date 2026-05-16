@@ -7,6 +7,7 @@ from django.utils import timezone
 from django.views import View
 
 from apps.catalog.models import MediaAsset
+from apps.catalog.media_services import create_media_asset, media_asset_usage
 from apps.cms.models import (
   AnnouncementBar,
   AppBanner,
@@ -370,7 +371,7 @@ class MediaListCreateView(LoginRequiredMixin, StaffOnlyMixin, View):
     kind = request.POST.get("kind") or "image"
     title = (request.POST.get("title") or "")[:120]
     alt = (request.POST.get("alt") or "")[:180]
-    a = MediaAsset.objects.create(kind=kind, file=f, title=title, alt=alt)
+    a, _, _ = create_media_asset(file=f, kind=kind, title=title, alt=alt, context=MediaAsset.Context.CMS_SECTIONS, cms_section="visual_editor")
     return JsonResponse({"ok": True, "item": {"id": a.id, "kind": a.kind, "title": a.title, "alt": a.alt, "url": a.file.url}})
 
 
@@ -379,6 +380,9 @@ class MediaDeleteView(LoginRequiredMixin, StaffOnlyMixin, View):
     a = MediaAsset.objects.filter(pk=pk).first()
     if not a:
       return JsonResponse({"ok": False}, status=404)
+    usage = media_asset_usage(a)
+    if usage.get("total_links", 0) > 0:
+      return JsonResponse({"ok": False, "error": "in_use", "usage": usage}, status=409)
     a.delete()
     return JsonResponse({"ok": True})
 

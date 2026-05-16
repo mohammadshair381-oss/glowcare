@@ -13,6 +13,10 @@ from .views_dashboard import (
   HomepageSectionOrderView,
   HomepageVisualEditorView,
   MediaLibraryView,
+  ManageAssetsView,
+  AssetsListApi,
+  AssetsUploadApi,
+  AssetsDeleteApi,
   NavigationEditorView,
   NavigationOrderView,
   PromoStripEditView,
@@ -72,6 +76,10 @@ urlpatterns = [
   path("product-sections/<str:kind>/", ProductSectionEditView.as_view(), name="product_section_edit"),
 
   path("media/", MediaLibraryView.as_view(), name="media"),
+  path("assets/", ManageAssetsView.as_view(), name="assets"),
+  path("assets/api/list/", AssetsListApi.as_view(), name="assets_list_api"),
+  path("assets/api/upload/", AssetsUploadApi.as_view(), name="assets_upload_api"),
+  path("assets/api/<int:pk>/delete/", AssetsDeleteApi.as_view(), name="assets_delete_api"),
 
   path("theme/", ThemeEditView.as_view(), name="theme"),
   path("announcement/", AnnouncementEditView.as_view(), name="announcement"),

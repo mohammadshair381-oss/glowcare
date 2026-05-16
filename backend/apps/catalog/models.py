@@ -1,6 +1,8 @@
 from django.db import models
 from django.utils.text import slugify
 
+from .media_storage import media_asset_upload_to
+
 
 class TimeStampedModel(models.Model):
   created_at = models.DateTimeField(auto_now_add=True)
@@ -47,15 +49,34 @@ class Tag(TimeStampedModel):
 class MediaAsset(TimeStampedModel):
   """
   Shared media library asset.
-  Stored in MEDIA_ROOT/uploads/<yyyy>/<mm>/...
+  Stored in MEDIA_ROOT/uploads/<kind>/<context>/<...>/<yyyy>/<mm>/...
   """
 
   class Kind(models.TextChoices):
     IMAGE = "image", "Image"
     VIDEO = "video", "Video"
 
+  class Context(models.TextChoices):
+    HOMEPAGE = "homepage", "Homepage"
+    BANNERS = "banners", "Banners"
+    BRANDS = "brands", "Brands"
+    PRODUCTS = "products", "Products"
+    PROMOS = "promos", "Promos"
+    CMS_SECTIONS = "cms_sections", "CMS sections"
+    TEMP = "temp", "Temp"
+
   kind = models.CharField(max_length=16, choices=Kind.choices, default=Kind.IMAGE)
-  file = models.FileField(upload_to="uploads/%Y/%m/")
+  context = models.CharField(max_length=32, choices=Context.choices, default=Context.TEMP)
+  cms_section = models.CharField(max_length=80, blank=True, default="")
+  product_category = models.CharField(max_length=80, blank=True, default="")
+  product_subcategory = models.CharField(max_length=80, blank=True, default="")
+
+  sha256 = models.CharField(max_length=64, blank=True, db_index=True, default="")
+  original_filename = models.CharField(max_length=240, blank=True, default="")
+  content_type = models.CharField(max_length=120, blank=True, default="")
+  size_bytes = models.BigIntegerField(null=True, blank=True)
+
+  file = models.FileField(upload_to=media_asset_upload_to)
   alt = models.CharField(max_length=180, blank=True)
   title = models.CharField(max_length=120, blank=True)
   width = models.PositiveIntegerField(null=True, blank=True)
@@ -63,6 +84,17 @@ class MediaAsset(TimeStampedModel):
 
   def __str__(self):
     return self.title or self.file.name
+
+  def delete(self, *args, **kwargs):
+    storage = getattr(self.file, "storage", None)
+    name = getattr(self.file, "name", "") or ""
+    super().delete(*args, **kwargs)
+    if storage and name:
+      try:
+        storage.delete(name)
+      except Exception:
+        # best-effort cleanup; DB delete already succeeded
+        pass
 
 
 class Product(TimeStampedModel):
@@ -139,4 +171,3 @@ class Variant(TimeStampedModel):
 
   def __str__(self):
     return f"{self.product.name} — {self.sku}"
-

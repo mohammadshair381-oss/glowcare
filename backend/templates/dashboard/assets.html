@@ -1,0 +1,160 @@
+{% extends "dashboard/base.html" %}
+{% block title %}Manage Assets — GlowCare CMS{% endblock %}
+{% block header %}Manage Assets{% endblock %}
+{% block subheader %}Upload, search, preview and safely delete images/videos{% endblock %}
+
+{% block content %}
+  <section class="dpanel">
+    <div class="dpanel__head">
+      <div>
+        <div class="dpanel__title">Upload</div>
+        <div class="dpanel__sub">Files are stored under <code>/media/uploads/…</code> (structured + deduped)</div>
+      </div>
+      <div class="dpanel__actions" style="display:flex; gap:10px; flex-wrap:wrap;">
+        <span class="dpill">Total: <span data-asset-count-total>{{ counts.total }}</span></span>
+        <span class="dpill">Images: <span data-asset-count-images>{{ counts.images }}</span></span>
+        <span class="dpill">Videos: <span data-asset-count-videos>{{ counts.videos }}</span></span>
+      </div>
+    </div>
+
+    <form
+      data-assets-upload
+      data-assets-list-url="{% url 'dashboard:assets_list_api' %}"
+      data-assets-delete-base="/dashboard/assets/api/"
+      method="post"
+      enctype="multipart/form-data"
+      action="{% url 'dashboard:assets_upload_api' %}"
+      style="margin-top:12px; display:grid; grid-template-columns: 1fr 1fr; gap: 12px;"
+    >
+      {% csrf_token %}
+      <div class="drow2">
+        <label class="dlabel">Title</label>
+        <input class="dinput" name="title" placeholder="Berry hero card…">
+      </div>
+      <div class="drow2">
+        <label class="dlabel">Alt</label>
+        <input class="dinput" name="alt" placeholder="Product image">
+      </div>
+      <div class="drow2">
+        <label class="dlabel">Type</label>
+        <select class="dinput" name="kind">
+          <option value="image">Image</option>
+          <option value="video">Video</option>
+        </select>
+      </div>
+      <div class="drow2">
+        <label class="dlabel">Context</label>
+        <select class="dinput" name="context" data-assets-context>
+          <option value="homepage">Homepage</option>
+          <option value="banners">Banners</option>
+          <option value="brands">Brands</option>
+          <option value="products">Products</option>
+          <option value="promos">Promos</option>
+          <option value="cms_sections">CMS sections</option>
+          <option value="temp" selected>Temp / misc</option>
+        </select>
+      </div>
+
+      <div class="drow2" data-assets-products-only hidden>
+        <label class="dlabel">Product category (optional)</label>
+        <select class="dinput" name="product_category">
+          <option value="">— Select category —</option>
+          {% for s in categories %}
+            {% if s %}<option value="{{ s }}">{{ s }}</option>{% endif %}
+          {% endfor %}
+        </select>
+        <div class="dhelp">Used only for product uploads to build folders.</div>
+      </div>
+      <div class="drow2" data-assets-products-only hidden>
+        <label class="dlabel">Product subcategory (optional)</label>
+        <input class="dinput" name="product_subcategory" placeholder="cleansers / serums / moisturizers …">
+        <div class="dhelp">Optional deeper folder.</div>
+      </div>
+
+      <div class="drow2" style="grid-column: 1 / -1;">
+        <div style="display:flex; justify-content:space-between; align-items:flex-end; gap: 10px;">
+          <div>
+            <label class="dlabel">Add assets</label>
+            <div class="dhelp">Drag & drop files onto this area, or click to select.</div>
+          </div>
+          <button class="dbtn dbtn--primary" type="button" data-assets-pick>Add Assets</button>
+        </div>
+        <div
+          data-assets-drop
+          style="margin-top:10px; border:1px solid rgba(255,255,255,.12); background: rgba(0,0,0,.14); border-radius: 18px; padding: 12px;"
+        >
+          <input class="dinput" type="file" name="files" multiple data-assets-file>
+        </div>
+      </div>
+
+      <div style="grid-column: 1 / -1;">
+        <div class="dassets__progress" hidden data-assets-progress>
+          <div class="dassets__progressBar"><span data-assets-progress-bar></span></div>
+          <div class="dhelp" data-assets-progress-text>Preparing upload…</div>
+        </div>
+      </div>
+    </form>
+  </section>
+
+  <section class="dpanel">
+    <div class="dpanel__head">
+      <div>
+        <div class="dpanel__title">Library</div>
+        <div class="dpanel__sub">Search, preview, copy URL, and delete (with safety checks).</div>
+      </div>
+      <div class="dpanel__actions">
+        <div class="dassets__filters">
+          <button class="dbtn" type="button" data-assets-kind="all">All</button>
+          <button class="dbtn" type="button" data-assets-kind="image">Images</button>
+          <button class="dbtn" type="button" data-assets-kind="video">Videos</button>
+        </div>
+      </div>
+    </div>
+
+    <div style="margin-top:12px; display:flex; flex-direction:column; gap: 8px;">
+      <input class="dinput" placeholder="Search by title, filename, alt, hash…" data-assets-search>
+      <div class="dhelp">Copy URLs to reuse across hero/products/banners. Deletion is blocked when linked.</div>
+    </div>
+
+    <div data-assets-grid style="margin-top:12px; display:grid; grid-template-columns: repeat(6, minmax(0, 1fr)); gap: 10px;">
+      {% for a in assets %}
+        <div
+          data-asset-id="{{ a.id }}"
+          data-asset-kind="{{ a.kind }}"
+          data-asset-url="{{ a.file.url }}"
+          data-asset-title="{{ a.title|default_if_none:'' }}"
+          style="border:1px solid rgba(255,255,255,.10); background: rgba(0,0,0,.18); border-radius: 18px; overflow:hidden;"
+        >
+          <div style="aspect-ratio: 1 / 1; display:grid; place-items:center; background: rgba(255,255,255,.04); position:relative;">
+            {% if a.kind == "image" %}
+              <img src="{{ a.file.url }}" alt="" loading="lazy" style="max-width: 92%; max-height: 92%;">
+            {% else %}
+              <div class="dmuted" style="margin:0;">Video</div>
+            {% endif %}
+          </div>
+          <div style="padding:10px;">
+            <div style="font-weight:900; font-size:12px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;">{{ a.title|default:a.original_filename|default:a.file.name }}</div>
+            <div class="dhelp" style="margin-top:6px; word-break: break-all;">{{ a.file.url }}</div>
+            <div style="margin-top:10px; display:flex; gap: 8px; flex-wrap:wrap;">
+              <button class="dbtn" type="button" data-asset-preview>Preview</button>
+              <button class="dbtn" type="button" data-asset-copy>Copy URL</button>
+              <button class="dbtn" type="button" data-asset-delete>Delete</button>
+            </div>
+          </div>
+      {% empty %}
+        <div class="dmuted">No assets yet. Upload your first image/video above.</div>
+      {% endfor %}
+    </div>
+  </section>
+
+  <div class="dmodal" hidden data-assets-modal>
+    <div class="dmodal__card" role="dialog" aria-modal="true">
+      <div class="dmodal__head">
+        <div class="dmodal__title" data-assets-modal-title>Preview</div>
+        <button class="dbtn" type="button" data-assets-modal-close>Close</button>
+      </div>
+      <div class="dmodal__body" data-assets-modal-body></div>
+      <div class="dmodal__foot" data-assets-modal-foot hidden></div>
+    </div>
+  </div>
+{% endblock %}

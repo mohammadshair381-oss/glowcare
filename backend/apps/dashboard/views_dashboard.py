@@ -11,7 +11,8 @@ from django.views.generic import TemplateView
 
 from django.core.files.base import ContentFile
 
-from apps.catalog.models import MediaAsset, Product, Variant
+from apps.catalog.models import Category, MediaAsset, Product, Variant
+from apps.catalog.media_services import create_media_asset, media_asset_usage, search_assets_queryset
 from apps.cms.models import (
   AnnouncementBar,
   AppBanner,
@@ -195,7 +196,15 @@ class HeroSlideEditView(LoginRequiredMixin, StaffRequiredMixin, View):
       def create_asset(upload, title):
         if not upload:
           return None
-        return MediaAsset.objects.create(kind="image", title=title[:120], alt=title[:180], file=upload)
+        asset, _, _ = create_media_asset(
+          file=upload,
+          kind="image",
+          title=title[:120],
+          alt=title[:180],
+          context=MediaAsset.Context.HOMEPAGE,
+          cms_section="hero",
+        )
+        return asset
 
       bg_up = form.cleaned_data.get("background_upload")
       ca = form.cleaned_data.get("card_a_upload")
@@ -639,8 +648,127 @@ class MediaLibraryView(LoginRequiredMixin, StaffRequiredMixin, TemplateView):
     title = request.POST.get("title") or ""
     alt = request.POST.get("alt") or ""
     if file:
-      MediaAsset.objects.create(kind=kind, file=file, title=title[:120], alt=alt[:180])
+      create_media_asset(file=file, kind=kind, title=title[:120], alt=alt[:180], context=MediaAsset.Context.TEMP)
     return redirect("dashboard:media")
+
+
+class ManageAssetsView(LoginRequiredMixin, StaffRequiredMixin, TemplateView):
+  template_name = "dashboard/assets.html"
+
+  def get_context_data(self, **kwargs):
+    ctx = super().get_context_data(**kwargs)
+    ctx["categories"] = list(Category.objects.order_by("name").values_list("slug", flat=True))
+    ctx["assets"] = MediaAsset.objects.order_by("-created_at")[:60]
+    ctx["counts"] = {
+      "total": MediaAsset.objects.count(),
+      "images": MediaAsset.objects.filter(kind=MediaAsset.Kind.IMAGE).count(),
+      "videos": MediaAsset.objects.filter(kind=MediaAsset.Kind.VIDEO).count(),
+    }
+    return ctx
+
+
+class AssetsListApi(LoginRequiredMixin, StaffRequiredMixin, View):
+  def get(self, request: HttpRequest) -> JsonResponse:
+    q = (request.GET.get("q") or "").strip()
+    kind = (request.GET.get("kind") or "").strip().lower()
+    ctx = (request.GET.get("context") or "").strip()
+
+    qs = search_assets_queryset(q).order_by("-created_at")
+    if kind in ["image", "video"]:
+      qs = qs.filter(kind=kind)
+    if ctx:
+      qs = qs.filter(context=ctx)
+
+    items = []
+    for a in qs[:240]:
+      items.append(
+        {
+          "id": a.id,
+          "kind": a.kind,
+          "title": a.title,
+          "alt": a.alt,
+          "url": a.file.url,
+          "filename": a.original_filename or (a.file.name.split("/")[-1] if a.file.name else ""),
+          "context": a.context,
+          "cms_section": a.cms_section,
+          "product_category": a.product_category,
+          "product_subcategory": a.product_subcategory,
+          "size_bytes": a.size_bytes,
+          "created_at": a.created_at.isoformat() if a.created_at else None,
+        }
+      )
+
+    return JsonResponse(
+      {
+        "ok": True,
+        "items": items,
+        "counts": {
+          "total": MediaAsset.objects.count(),
+          "images": MediaAsset.objects.filter(kind=MediaAsset.Kind.IMAGE).count(),
+          "videos": MediaAsset.objects.filter(kind=MediaAsset.Kind.VIDEO).count(),
+        },
+      }
+    )
+
+
+class AssetsUploadApi(LoginRequiredMixin, StaffRequiredMixin, View):
+  def post(self, request: HttpRequest) -> JsonResponse:
+    files = request.FILES.getlist("files") or ([] if not request.FILES.get("file") else [request.FILES.get("file")])
+    if not files:
+      return JsonResponse({"ok": False, "error": "missing_file"}, status=400)
+
+    kind = (request.POST.get("kind") or "image").lower()
+    title = (request.POST.get("title") or "")[:120]
+    alt = (request.POST.get("alt") or "")[:180]
+    context = (request.POST.get("context") or MediaAsset.Context.TEMP).strip() or MediaAsset.Context.TEMP
+    cms_section = (request.POST.get("cms_section") or "").strip()
+    product_category = (request.POST.get("product_category") or "").strip()
+    product_subcategory = (request.POST.get("product_subcategory") or "").strip()
+
+    out = []
+    for f in files[:24]:
+      asset, created, dup = create_media_asset(
+        file=f,
+        kind=kind,
+        title=title or (asset_title_from_filename(getattr(f, "name", ""))),
+        alt=alt,
+        context=context,
+        cms_section=cms_section,
+        product_category=product_category,
+        product_subcategory=product_subcategory,
+      )
+      out.append(
+        {
+          "id": asset.id,
+          "kind": asset.kind,
+          "title": asset.title,
+          "alt": asset.alt,
+          "url": asset.file.url,
+          "duplicate": bool(dup),
+          "created": bool(created),
+        }
+      )
+
+    return JsonResponse({"ok": True, "items": out})
+
+
+def asset_title_from_filename(name: str) -> str:
+  base = (name or "").split("/")[-1].split("\\")[-1]
+  return base[:120]
+
+
+class AssetsDeleteApi(LoginRequiredMixin, StaffRequiredMixin, View):
+  def post(self, request: HttpRequest, pk: int) -> JsonResponse:
+    a = MediaAsset.objects.filter(pk=pk).first()
+    if not a:
+      return JsonResponse({"ok": False, "error": "not_found"}, status=404)
+
+    usage = media_asset_usage(a)
+    if usage.get("total_links", 0) > 0:
+      return JsonResponse({"ok": False, "error": "in_use", "usage": usage}, status=409)
+
+    a.delete()
+    return JsonResponse({"ok": True})
 
 
 class ThemeEditView(LoginRequiredMixin, StaffRequiredMixin, View):
