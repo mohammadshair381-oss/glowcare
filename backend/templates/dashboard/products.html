@@ -1,7 +1,7 @@
 {% extends "dashboard/base.html" %}
 {% block title %}Products — GlowCare CMS{% endblock %}
 {% block header %}Products{% endblock %}
-{% block subheader %}Create/edit products, variants, pricing and badges{% endblock %}
+{% block subheader %}Create/edit products, variants, pricing and visibility{% endblock %}
 
 {% block content %}
   <section class="dpanel">
@@ -21,28 +21,58 @@
       <a class="dbtn" href="{% url 'dashboard:products' %}">Reset</a>
     </form>
 
-    <div class="dtable">
-      <div class="dthead" style="grid-template-columns: 1fr 2fr 1fr 1fr 1fr 1fr;">
-        <div>SKU</div>
-        <div>Name</div>
-        <div>Category</div>
-        <div>Price</div>
-        <div>Badge</div>
-        <div></div>
+    <form method="post" style="margin-top:12px;">
+      {% csrf_token %}
+      <div style="display:flex; gap:10px; flex-wrap:wrap; align-items:center;">
+        <select class="dinput" name="action" style="max-width: 260px;">
+          <option value="">Bulk actions…</option>
+          <option value="publish">Publish</option>
+          <option value="unpublish">Unpublish</option>
+          <option value="activate">Activate</option>
+          <option value="deactivate">Deactivate</option>
+        </select>
+        <button class="dbtn" type="submit">Apply</button>
+        <div class="dhelp">Select products below, then apply.</div>
       </div>
-      {% for p in products %}
-        <div class="drow" style="grid-template-columns: 1fr 2fr 1fr 1fr 1fr 1fr;">
-          <div>{{ p.sku }}</div>
-          <div>{{ p.name }}</div>
-          <div>{{ p.category.slug }}</div>
-          <div>₹{{ p.price }}</div>
-          <div>{% if p.badge %}<span class="dpill dpill--ok">{{ p.badge }}</span>{% else %}<span class="dpill">—</span>{% endif %}</div>
-          <div><a class="dbtn" href="{% url 'dashboard:product_edit' p.id %}">Edit</a></div>
+
+      <div class="dtable">
+        <div class="dthead" style="grid-template-columns: .4fr 1fr 2fr 1fr 1fr 1fr 1fr 1fr;">
+          <div></div>
+          <div>SKU</div>
+          <div>Name</div>
+          <div>Category</div>
+          <div>Status</div>
+          <div>Stock</div>
+          <div>Price</div>
+          <div></div>
         </div>
-      {% empty %}
-        <div class="dmuted">No products found.</div>
-      {% endfor %}
-    </div>
+        {% for p in products %}
+          <div class="drow" style="grid-template-columns: .4fr 1fr 2fr 1fr 1fr 1fr 1fr 1fr;">
+            <div><input type="checkbox" name="ids" value="{{ p.id }}"></div>
+            <div>{{ p.sku }}</div>
+            <div>
+              {{ p.name }}
+              {% if p.brand_ref_id %}<div class="dhelp" style="margin-top:4px;">{{ p.brand_ref.name }}</div>{% endif %}
+            </div>
+            <div>
+              {{ p.category.slug }}
+              {% if p.subcategory_id %}<div class="dhelp" style="margin-top:4px;">{{ p.subcategory.slug }}</div>{% endif %}
+            </div>
+            <div>
+              {% if p.is_published %}<span class="dpill dpill--ok">Published</span>{% else %}<span class="dpill">Hidden</span>{% endif %}
+              {% if not p.is_active %}<span class="dpill" style="margin-left:6px;">Inactive</span>{% endif %}
+            </div>
+            <div>
+              {% if p.id in low_ids %}<span class="dpill" style="border-color: rgba(255,46,122,.30); background: rgba(255,46,122,.10);">Low</span>{% else %}<span class="dpill">OK</span>{% endif %}
+            </div>
+            <div>₹{{ p.price }}</div>
+            <div><a class="dbtn" href="{% url 'dashboard:product_edit' p.id %}">Edit</a></div>
+          </div>
+        {% empty %}
+          <div class="dmuted">No products found.</div>
+        {% endfor %}
+      </div>
+    </form>
   </section>
 {% endblock %}
 

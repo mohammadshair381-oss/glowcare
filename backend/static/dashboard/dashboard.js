@@ -98,6 +98,28 @@
     });
   }
 
+  function initSaveProductGallery() {
+    const btn = qs("[data-save-product-gallery]");
+    const form = qs("#productGalleryOrderForm");
+    const list = qs("#productGallerySortable");
+    if (!btn || !form || !list) return;
+    btn.addEventListener("click", async () => {
+      const order = qsa(".ditem", list).map((el) => el.dataset.id);
+      const body = new URLSearchParams();
+      body.set("csrfmiddlewaretoken", csrfToken());
+      order.forEach((id) => body.append("order[]", id));
+      btn.textContent = "Saving…";
+      try {
+        const res = await fetch(form.action, { method: "POST", headers: { "Content-Type": "application/x-www-form-urlencoded" }, body });
+        const json = await res.json();
+        btn.textContent = json?.ok ? "Saved" : "Save failed";
+      } catch {
+        btn.textContent = "Save failed";
+      }
+      setTimeout(() => (btn.textContent = "Save order"), 1200);
+    });
+  }
+
   function initAssetsManager() {
     const uploadForm = qs("[data-assets-upload]");
     const grid = qs("[data-assets-grid]");
@@ -500,6 +522,7 @@
       initSaveSections();
       initSaveHero();
       initSaveNav();
+      initSaveProductGallery();
       initAssetsManager();
     });
   } else {
@@ -507,6 +530,7 @@
     initSaveSections();
     initSaveHero();
     initSaveNav();
+    initSaveProductGallery();
     initAssetsManager();
   }
 })();

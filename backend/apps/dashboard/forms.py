@@ -1,6 +1,6 @@
 from django import forms
 
-from apps.catalog.models import Category, MediaAsset, Product, Variant
+from apps.catalog.models import Brand, Category, MediaAsset, Product, SubCategory, Tag, Variant
 from apps.cms.models import AnnouncementBar, AppBanner, FooterColumn, FooterLink, FooterSetting, NavigationLink, NavigationMenu, PromoStrip, ThemeSetting, HeroSlide, FeaturedLogo, Testimonial, HomepageSection, ProductSection
 
 
@@ -8,6 +8,10 @@ class JsonTextarea(forms.Textarea):
   def __init__(self, *args, **kwargs):
     super().__init__(*args, **kwargs)
     self.attrs.setdefault("rows", 4)
+
+
+class MultipleFileInput(forms.ClearableFileInput):
+  allow_multiple_selected = True
 
 
 class ThemeForm(forms.ModelForm):
@@ -48,13 +52,19 @@ class ProductForm(forms.ModelForm):
   skin_type_tags_csv = forms.CharField(required=False, help_text="Comma-separated, e.g. oily,combination", widget=forms.TextInput(attrs={"class": "dinput"}))
   ingredients_csv = forms.CharField(required=False, help_text="Comma-separated", widget=forms.Textarea(attrs={"class": "dinput", "rows": 3}))
 
+  featured_upload = forms.FileField(required=False, widget=forms.ClearableFileInput(attrs={"class": "dinput"}), help_text="Optional. Upload a featured image (saved into structured product folders).")
+  # Multi-file widget (Django requires allow_multiple_selected=True for multiple uploads).
+  gallery_uploads = forms.FileField(required=False, widget=MultipleFileInput(attrs={"class": "dinput", "multiple": True}), help_text="Optional. Upload multiple gallery images at once.")
+
   class Meta:
     model = Product
     fields = [
       "sku",
       "name",
       "brand",
+      "brand_ref",
       "category",
+      "subcategory",
       "description",
       "price",
       "compare_at_price",
@@ -63,13 +73,16 @@ class ProductForm(forms.ModelForm):
       "reviews_count",
       "is_active",
       "is_published",
+      "tags",
       "primary_media",
     ]
     widgets = {
       "sku": forms.TextInput(attrs={"class": "dinput"}),
       "name": forms.TextInput(attrs={"class": "dinput"}),
       "brand": forms.TextInput(attrs={"class": "dinput"}),
+      "brand_ref": forms.Select(attrs={"class": "dinput"}),
       "category": forms.Select(attrs={"class": "dinput"}),
+      "subcategory": forms.Select(attrs={"class": "dinput"}),
       "description": forms.Textarea(attrs={"class": "dinput", "rows": 4}),
       "price": forms.NumberInput(attrs={"class": "dinput"}),
       "compare_at_price": forms.NumberInput(attrs={"class": "dinput"}),
@@ -79,6 +92,7 @@ class ProductForm(forms.ModelForm):
       "primary_media": forms.Select(attrs={"class": "dinput"}),
       "is_active": forms.CheckboxInput(attrs={}),
       "is_published": forms.CheckboxInput(attrs={}),
+      "tags": forms.SelectMultiple(attrs={"class": "dinput"}),
     }
 
   def __init__(self, *args, **kwargs):
@@ -88,6 +102,10 @@ class ProductForm(forms.ModelForm):
       for name in ["skincare", "hair", "makeup", "fragrance"]:
         Category.objects.get_or_create(name=name)
     self.fields["primary_media"].queryset = MediaAsset.objects.order_by("-created_at")
+    self.fields["brand_ref"].queryset = Brand.objects.filter(is_active=True).order_by("name")
+    self.fields["subcategory"].queryset = SubCategory.objects.select_related("category").filter(is_active=True).order_by("category__name", "name")
+    self.fields["tags"].queryset = Tag.objects.order_by("name")
+    self.fields["brand"].help_text = "Optional. If you select a Brand, this text will be used as fallback for older records."
     if self.instance and self.instance.pk:
       self.fields["concern_tags_csv"].initial = ",".join(self.instance.concern_tags or [])
       self.fields["skin_type_tags_csv"].initial = ",".join(self.instance.skin_type_tags or [])

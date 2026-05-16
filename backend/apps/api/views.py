@@ -1,7 +1,8 @@
 from django.utils.decorators import method_decorator
 from django.views.decorators.csrf import ensure_csrf_cookie
 from django.utils import timezone
-from rest_framework import generics, permissions, status
+from django_filters.rest_framework import DjangoFilterBackend
+from rest_framework import filters, generics, permissions, status
 from rest_framework.response import Response
 from rest_framework.views import APIView
 
@@ -200,14 +201,24 @@ class HomepageView(APIView):
 
 
 class ProductListView(generics.ListAPIView):
-  queryset = Product.objects.filter(is_active=True, is_published=True).select_related("category", "primary_media").prefetch_related("variants", "images__media")
+  queryset = (
+    Product.objects.filter(is_active=True, is_published=True)
+    .select_related("category", "subcategory", "brand_ref", "primary_media")
+    .prefetch_related("variants", "images__media", "tags")
+  )
   serializer_class = ProductSerializer
-  filterset_fields = ["badge", "category__slug", "brand"]
+  filterset_fields = ["badge", "category__slug", "subcategory__slug", "brand", "brand_ref__slug"]
   ordering_fields = ["price", "rating", "updated_at"]
+  search_fields = ["name", "sku", "brand", "brand_ref__name"]
+  filter_backends = [DjangoFilterBackend, filters.OrderingFilter, filters.SearchFilter]
 
 
 class ProductDetailView(generics.RetrieveAPIView):
-  queryset = Product.objects.filter(is_active=True, is_published=True).select_related("category", "primary_media").prefetch_related("variants", "images__media")
+  queryset = (
+    Product.objects.filter(is_active=True, is_published=True)
+    .select_related("category", "subcategory", "brand_ref", "primary_media")
+    .prefetch_related("variants", "images__media", "tags")
+  )
   serializer_class = ProductSerializer
 
 

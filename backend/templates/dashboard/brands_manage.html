@@ -1,0 +1,48 @@
+{% extends "dashboard/base.html" %}
+{% block title %}Brands — GlowCare CMS{% endblock %}
+{% block header %}Brands{% endblock %}
+{% block subheader %}Structured brand catalog (used by products + filters){% endblock %}
+
+{% block content %}
+  <section class="dpanel">
+    <div class="dpanel__head">
+      <div>
+        <div class="dpanel__title">Add brand</div>
+        <div class="dpanel__sub">Use consistent names for clean filtering and future scalability.</div>
+      </div>
+    </div>
+
+    <form method="post" style="margin-top:12px; display:grid; grid-template-columns: 1fr .3fr; gap: 10px;">
+      {% csrf_token %}
+      <input class="dinput" name="name" placeholder="GlowCare / CeraVe / The Ordinary …">
+      <button class="dbtn dbtn--primary" type="submit">Add</button>
+    </form>
+  </section>
+
+  <section class="dpanel">
+    <div class="dpanel__head">
+      <div>
+        <div class="dpanel__title">All brands</div>
+        <div class="dpanel__sub">Select in Product editor.</div>
+      </div>
+    </div>
+
+    <div class="dtable">
+      <div class="dthead" style="grid-template-columns: 2fr 1fr 1fr;">
+        <div>Name</div>
+        <div>Slug</div>
+        <div>Status</div>
+      </div>
+      {% for b in brands %}
+        <div class="drow" style="grid-template-columns: 2fr 1fr 1fr;">
+          <div>{{ b.name }}</div>
+          <div>{{ b.slug }}</div>
+          <div>{% if b.is_active %}<span class="dpill dpill--ok">Active</span>{% else %}<span class="dpill">Disabled</span>{% endif %}</div>
+        </div>
+      {% empty %}
+        <div class="dmuted">No brands yet.</div>
+      {% endfor %}
+    </div>
+  </section>
+{% endblock %}
+

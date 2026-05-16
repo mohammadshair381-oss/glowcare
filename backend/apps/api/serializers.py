@@ -15,9 +15,12 @@ class VariantSerializer(serializers.ModelSerializer):
 
 class ProductSerializer(serializers.ModelSerializer):
   category = serializers.CharField(source="category.slug")
+  subcategory = serializers.SerializerMethodField()
   image = serializers.SerializerMethodField()
   gallery = serializers.SerializerMethodField()
   badge = serializers.CharField()
+  brand = serializers.SerializerMethodField()
+  tags = serializers.SerializerMethodField()
   rating = serializers.SerializerMethodField()
   reviewsCount = serializers.IntegerField(source="reviews_count")
   skinTypeTags = serializers.JSONField(source="skin_type_tags")
@@ -32,6 +35,7 @@ class ProductSerializer(serializers.ModelSerializer):
       "name",
       "brand",
       "category",
+      "subcategory",
       "price",
       "compare_at_price",
       "badge",
@@ -41,10 +45,27 @@ class ProductSerializer(serializers.ModelSerializer):
       "rating",
       "reviewsCount",
       "ingredients",
+      "tags",
       "skinTypeTags",
       "concernTags",
       "variants",
     ]
+
+  def get_brand(self, obj: Product):
+    if getattr(obj, "brand_ref_id", None) and getattr(obj, "brand_ref", None):
+      return obj.brand_ref.name
+    return obj.brand or ""
+
+  def get_subcategory(self, obj: Product):
+    if getattr(obj, "subcategory_id", None) and getattr(obj, "subcategory", None):
+      return obj.subcategory.slug
+    return ""
+
+  def get_tags(self, obj: Product):
+    try:
+      return [t.slug for t in obj.tags.all()]
+    except Exception:
+      return []
 
   def get_image(self, obj: Product):
     if obj.primary_media_id:

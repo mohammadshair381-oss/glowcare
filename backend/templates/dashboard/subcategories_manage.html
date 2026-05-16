@@ -1,0 +1,55 @@
+{% extends "dashboard/base.html" %}
+{% block title %}Subcategories — GlowCare CMS{% endblock %}
+{% block header %}Subcategories{% endblock %}
+{% block subheader %}Category → subcategory structure for scalable catalogs{% endblock %}
+
+{% block content %}
+  <section class="dpanel">
+    <div class="dpanel__head">
+      <div>
+        <div class="dpanel__title">Add subcategory</div>
+        <div class="dpanel__sub">Example: skincare → cleansers / serums / moisturizers</div>
+      </div>
+    </div>
+
+    <form method="post" style="margin-top:12px; display:grid; grid-template-columns: 1fr 1fr .3fr; gap: 10px;">
+      {% csrf_token %}
+      <select class="dinput" name="category_id">
+        {% for c in categories %}
+          <option value="{{ c.id }}">{{ c.name }}</option>
+        {% endfor %}
+      </select>
+      <input class="dinput" name="name" placeholder="cleansers / serums / moisturizers …">
+      <button class="dbtn dbtn--primary" type="submit">Add</button>
+    </form>
+  </section>
+
+  <section class="dpanel">
+    <div class="dpanel__head">
+      <div>
+        <div class="dpanel__title">All subcategories</div>
+        <div class="dpanel__sub">Select in Product editor.</div>
+      </div>
+    </div>
+
+    <div class="dtable">
+      <div class="dthead" style="grid-template-columns: 1fr 1fr 1fr 1fr;">
+        <div>Category</div>
+        <div>Name</div>
+        <div>Slug</div>
+        <div>Status</div>
+      </div>
+      {% for s in subs %}
+        <div class="drow" style="grid-template-columns: 1fr 1fr 1fr 1fr;">
+          <div>{{ s.category.slug }}</div>
+          <div>{{ s.name }}</div>
+          <div>{{ s.slug }}</div>
+          <div>{% if s.is_active %}<span class="dpill dpill--ok">Active</span>{% else %}<span class="dpill">Disabled</span>{% endif %}</div>
+        </div>
+      {% empty %}
+        <div class="dmuted">No subcategories yet.</div>
+      {% endfor %}
+    </div>
+  </section>
+{% endblock %}
+

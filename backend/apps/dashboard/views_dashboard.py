@@ -2,16 +2,17 @@ from django.utils.decorators import method_decorator
 from django.views.decorators.clickjacking import xframe_options_sameorigin
 from django.contrib.auth.mixins import LoginRequiredMixin, UserPassesTestMixin
 from django.db import transaction
-from django.db.models import Q
+from django.db.models import F, Q
 from django.http import HttpRequest, HttpResponse, JsonResponse
 from django.shortcuts import get_object_or_404, redirect, render
 from django.urls import reverse
+from django.utils.text import slugify
 from django.views import View
 from django.views.generic import TemplateView
 
 from django.core.files.base import ContentFile
 
-from apps.catalog.models import Category, MediaAsset, Product, Variant
+from apps.catalog.models import Brand, Category, MediaAsset, Product, ProductImage, SubCategory, Variant
 from apps.catalog.media_services import create_media_asset, media_asset_usage, search_assets_queryset
 from apps.cms.models import (
   AnnouncementBar,
@@ -596,12 +597,39 @@ class ProductListView(LoginRequiredMixin, StaffRequiredMixin, TemplateView):
   def get_context_data(self, **kwargs):
     ctx = super().get_context_data(**kwargs)
     q = (self.request.GET.get("q") or "").strip()
-    qs = Product.objects.select_related("category").order_by("-updated_at")
+    qs = Product.objects.select_related("category", "subcategory", "brand_ref").order_by("-updated_at")
     if q:
-      qs = qs.filter(Q(name__icontains=q) | Q(sku__icontains=q) | Q(brand__icontains=q))
+      qs = qs.filter(Q(name__icontains=q) | Q(sku__icontains=q) | Q(brand__icontains=q) | Q(brand_ref__name__icontains=q))
     ctx["q"] = q
-    ctx["products"] = qs[:200]
+    products = list(qs[:200])
+    # low stock flag (safe + small N)
+    low_ids = set(
+      Variant.objects.filter(product_id__in=[p.id for p in products], is_active=True, track_inventory=True)
+      .filter(stock__lte=F("low_stock_threshold"))
+      .values_list("product_id", flat=True)
+      .distinct()
+    )
+    ctx["low_ids"] = low_ids
+    ctx["products"] = products
     return ctx
+
+  def post(self, request: HttpRequest) -> HttpResponse:
+    action = (request.POST.get("action") or "").strip()
+    ids = [int(x) for x in (request.POST.getlist("ids") or []) if str(x).isdigit()]
+    if not ids or action not in ["publish", "unpublish", "activate", "deactivate"]:
+      return redirect("dashboard:products")
+
+    qs = Product.objects.filter(pk__in=ids)
+    if action == "publish":
+      qs.update(is_published=True)
+    elif action == "unpublish":
+      qs.update(is_published=False)
+    elif action == "activate":
+      qs.update(is_active=True)
+    elif action == "deactivate":
+      qs.update(is_active=False)
+
+    return redirect("dashboard:products")
 
 
 class ProductEditView(LoginRequiredMixin, StaffRequiredMixin, View):
@@ -611,7 +639,8 @@ class ProductEditView(LoginRequiredMixin, StaffRequiredMixin, View):
     product = Product.objects.filter(pk=pk).first() if pk else None
     form = ProductForm(instance=product)
     variants = Variant.objects.filter(product=product).order_by("id") if product else []
-    return render(request, self.template_name, {"form": form, "product": product, "variants": variants, "vform": VariantForm()})
+    gallery = ProductImage.objects.select_related("media").filter(product=product).order_by("sort_order", "id") if product else []
+    return render(request, self.template_name, {"form": form, "product": product, "variants": variants, "gallery": gallery, "vform": VariantForm()})
 
   def post(self, request: HttpRequest, pk: int | None = None) -> HttpResponse:
     product = Product.objects.filter(pk=pk).first() if pk else None
@@ -620,7 +649,70 @@ class ProductEditView(LoginRequiredMixin, StaffRequiredMixin, View):
       obj = form.save()
       return redirect("dashboard:product_edit", pk=obj.pk)
     variants = Variant.objects.filter(product=product).order_by("id") if product else []
-    return render(request, self.template_name, {"form": form, "product": product, "variants": variants, "vform": VariantForm()})
+    gallery = ProductImage.objects.select_related("media").filter(product=product).order_by("sort_order", "id") if product else []
+    return render(request, self.template_name, {"form": form, "product": product, "variants": variants, "gallery": gallery, "vform": VariantForm()})
+
+
+class ProductGalleryUploadView(LoginRequiredMixin, StaffRequiredMixin, View):
+  def post(self, request: HttpRequest, pk: int) -> HttpResponse:
+    product = get_object_or_404(Product, pk=pk)
+    files = request.FILES.getlist("gallery_uploads") or []
+    featured = request.FILES.get("featured_upload")
+
+    cat = product.category.slug if product.category_id else ""
+    sub = product.subcategory.slug if getattr(product, "subcategory_id", None) else ""
+
+    if featured:
+      asset, _, _ = create_media_asset(
+        file=featured,
+        kind="image",
+        title=f"{product.name} featured",
+        alt=product.name,
+        context=MediaAsset.Context.PRODUCTS,
+        product_category=cat,
+        product_subcategory=sub,
+      )
+      product.primary_media = asset
+      product.save(update_fields=["primary_media", "updated_at"])
+
+    if files:
+      start = ProductImage.objects.filter(product=product).count()
+      for idx, f in enumerate(files[:24]):
+        asset, _, _ = create_media_asset(
+          file=f,
+          kind="image",
+          title=f"{product.name} gallery",
+          alt=product.name,
+          context=MediaAsset.Context.PRODUCTS,
+          product_category=cat,
+          product_subcategory=sub,
+        )
+        ProductImage.objects.create(product=product, media=asset, sort_order=start + idx)
+
+    return redirect("dashboard:product_edit", pk=product.pk)
+
+
+class ProductGalleryRemoveView(LoginRequiredMixin, StaffRequiredMixin, View):
+  def post(self, request: HttpRequest, pk: int) -> HttpResponse:
+    product = get_object_or_404(Product, pk=pk)
+    ids = [int(x) for x in (request.POST.getlist("remove_ids") or []) if str(x).isdigit()]
+    if ids:
+      ProductImage.objects.filter(product=product, pk__in=ids).delete()
+    return redirect("dashboard:product_edit", pk=product.pk)
+
+
+class ProductGalleryOrderView(LoginRequiredMixin, StaffRequiredMixin, View):
+  def post(self, request: HttpRequest, pk: int) -> JsonResponse:
+    product = get_object_or_404(Product, pk=pk)
+    order = request.POST.getlist("order[]") or request.POST.getlist("order")
+    if not order:
+      return JsonResponse({"ok": True})
+    with transaction.atomic():
+      for idx, pid in enumerate(order[:300]):
+        if not str(pid).isdigit():
+          continue
+        ProductImage.objects.filter(product=product, pk=int(pid)).update(sort_order=idx)
+    return JsonResponse({"ok": True})
 
 
 class ProductVariantAddView(LoginRequiredMixin, StaffRequiredMixin, View):
@@ -633,6 +725,40 @@ class ProductVariantAddView(LoginRequiredMixin, StaffRequiredMixin, View):
       v.save()
     return redirect("dashboard:product_edit", pk=product.pk)
 
+
+class BrandsView(LoginRequiredMixin, StaffRequiredMixin, TemplateView):
+  template_name = "dashboard/brands_manage.html"
+
+  def get_context_data(self, **kwargs):
+    ctx = super().get_context_data(**kwargs)
+    ctx["brands"] = Brand.objects.order_by("name")
+    return ctx
+
+  def post(self, request: HttpRequest) -> HttpResponse:
+    name = (request.POST.get("name") or "").strip()
+    if name:
+      Brand.objects.get_or_create(name=name[:80])
+    return redirect("dashboard:brands_manage")
+
+
+class SubCategoriesView(LoginRequiredMixin, StaffRequiredMixin, TemplateView):
+  template_name = "dashboard/subcategories_manage.html"
+
+  def get_context_data(self, **kwargs):
+    ctx = super().get_context_data(**kwargs)
+    ctx["categories"] = Category.objects.order_by("name")
+    ctx["subs"] = SubCategory.objects.select_related("category").order_by("category__name", "name")
+    return ctx
+
+  def post(self, request: HttpRequest) -> HttpResponse:
+    name = (request.POST.get("name") or "").strip()
+    cat_id = request.POST.get("category_id") or ""
+    if name and str(cat_id).isdigit():
+      cat = Category.objects.filter(pk=int(cat_id)).first()
+      if cat:
+        slug = slugify(name)[:105] or "other"
+        SubCategory.objects.get_or_create(category=cat, slug=slug, defaults={"name": name[:80], "is_active": True})
+    return redirect("dashboard:subcategories_manage")
 
 class MediaLibraryView(LoginRequiredMixin, StaffRequiredMixin, TemplateView):
   template_name = "dashboard/media.html"
@@ -672,12 +798,18 @@ class AssetsListApi(LoginRequiredMixin, StaffRequiredMixin, View):
     q = (request.GET.get("q") or "").strip()
     kind = (request.GET.get("kind") or "").strip().lower()
     ctx = (request.GET.get("context") or "").strip()
+    pc = (request.GET.get("product_category") or "").strip()
+    psc = (request.GET.get("product_subcategory") or "").strip()
 
     qs = search_assets_queryset(q).order_by("-created_at")
     if kind in ["image", "video"]:
       qs = qs.filter(kind=kind)
     if ctx:
       qs = qs.filter(context=ctx)
+    if pc:
+      qs = qs.filter(product_category=pc)
+    if psc:
+      qs = qs.filter(product_subcategory=psc)
 
     items = []
     for a in qs[:240]:

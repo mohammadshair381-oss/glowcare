@@ -30,6 +30,42 @@ class Category(TimeStampedModel):
     super().save(*args, **kwargs)
 
 
+class Brand(TimeStampedModel):
+  name = models.CharField(max_length=80, unique=True)
+  slug = models.SlugField(max_length=100, unique=True, blank=True)
+  is_active = models.BooleanField(default=True)
+
+  class Meta:
+    ordering = ["name"]
+
+  def __str__(self):
+    return self.name
+
+  def save(self, *args, **kwargs):
+    if not self.slug:
+      self.slug = slugify(self.name)
+    super().save(*args, **kwargs)
+
+
+class SubCategory(TimeStampedModel):
+  category = models.ForeignKey(Category, on_delete=models.PROTECT, related_name="subcategories")
+  name = models.CharField(max_length=80)
+  slug = models.SlugField(max_length=110, blank=True)
+  is_active = models.BooleanField(default=True)
+
+  class Meta:
+    ordering = ["category__name", "name"]
+    unique_together = [("category", "slug")]
+
+  def __str__(self):
+    return f"{self.category.slug}/{self.slug}"
+
+  def save(self, *args, **kwargs):
+    if not self.slug:
+      self.slug = slugify(self.name)[:105]
+    super().save(*args, **kwargs)
+
+
 class Tag(TimeStampedModel):
   name = models.CharField(max_length=50, unique=True)
   slug = models.SlugField(max_length=60, unique=True, blank=True)
@@ -113,7 +149,9 @@ class Product(TimeStampedModel):
   name = models.CharField(max_length=140)
   slug = models.SlugField(max_length=180, unique=True, blank=True)
   brand = models.CharField(max_length=80, default="GlowCare")
+  brand_ref = models.ForeignKey(Brand, null=True, blank=True, on_delete=models.SET_NULL, related_name="products")
   category = models.ForeignKey(Category, on_delete=models.PROTECT, related_name="products")
+  subcategory = models.ForeignKey(SubCategory, null=True, blank=True, on_delete=models.PROTECT, related_name="products")
   description = models.TextField(blank=True)
 
   price = models.PositiveIntegerField(help_text="Price in INR (integer)")
@@ -163,6 +201,8 @@ class Variant(TimeStampedModel):
   shade = models.CharField(max_length=80, blank=True, default="Original")
   size_ml = models.PositiveIntegerField(null=True, blank=True)
   stock = models.PositiveIntegerField(default=0)
+  track_inventory = models.BooleanField(default=True)
+  low_stock_threshold = models.PositiveIntegerField(default=5)
   is_active = models.BooleanField(default=True)
 
   class Meta:

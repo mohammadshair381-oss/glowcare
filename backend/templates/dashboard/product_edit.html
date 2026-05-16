@@ -22,8 +22,20 @@
         <div class="drow2"><label class="dlabel">Name</label>{{ form.name }}</div>
       </div>
       <div class="dgrid2">
-        <div class="drow2"><label class="dlabel">Brand</label>{{ form.brand }}</div>
-        <div class="drow2"><label class="dlabel">Category</label>{{ form.category }}</div>
+        <div class="drow2">
+          <label class="dlabel">Brand</label>
+          {{ form.brand_ref }}
+          <div class="dhelp">Select a brand for structured catalog filtering (recommended).</div>
+        </div>
+        <div class="drow2">
+          <label class="dlabel">Brand text (fallback)</label>
+          {{ form.brand }}
+          <div class="dhelp">Used only when no Brand is selected.</div>
+        </div>
+      </div>
+      <div class="dgrid2">
+        <div class="drow2"><label class="dlabel">Category</label>{{ form.category }}<div class="dhelp">Used for navigation + media folder organization.</div></div>
+        <div class="drow2"><label class="dlabel">Subcategory</label>{{ form.subcategory }}<div class="dhelp">Optional. Helps scale large catalogs.</div></div>
       </div>
       <div class="drow2"><label class="dlabel">Description</label>{{ form.description }}</div>
       <div class="dgrid2">
@@ -46,6 +58,7 @@
       <div class="drow2"><label class="dlabel">Concern tags</label>{{ form.concern_tags_csv }}<div class="dhelp">{{ form.concern_tags_csv.help_text }}</div></div>
       <div class="drow2"><label class="dlabel">Skin type tags</label>{{ form.skin_type_tags_csv }}<div class="dhelp">{{ form.skin_type_tags_csv.help_text }}</div></div>
       <div class="drow2"><label class="dlabel">Ingredients</label>{{ form.ingredients_csv }}<div class="dhelp">{{ form.ingredients_csv.help_text }}</div></div>
+      <div class="drow2"><label class="dlabel">Tags</label>{{ form.tags }}<div class="dhelp">Optional: structured tags for future filters and merchandising.</div></div>
 
       <div class="dactions2">
         <button class="dbtn dbtn--primary" type="submit">Save product</button>
@@ -55,6 +68,66 @@
   </section>
 
   {% if product %}
+    <section class="dpanel">
+      <div class="dpanel__head">
+        <div>
+          <div class="dpanel__title">Gallery</div>
+          <div class="dpanel__sub">Drag to reorder. Remove images in bulk. Uploads are organized into category folders.</div>
+        </div>
+        <div class="dpanel__actions">
+          <button class="dbtn" type="button" data-save-product-gallery>Save order</button>
+        </div>
+      </div>
+
+      <form id="productGalleryOrderForm" action="{% url 'dashboard:product_gallery_order' product.id %}" method="post" style="margin-top:12px;">
+        {% csrf_token %}
+        <div class="ditems" id="productGallerySortable" data-sortable>
+          {% for gi in gallery %}
+            <div class="ditem" data-id="{{ gi.id }}">
+              <span class="dhandle" aria-hidden="true">⋮⋮</span>
+              <div style="width: 44px; height: 44px; border-radius: 14px; overflow:hidden; border: 1px solid rgba(255,255,255,.10); background: rgba(255,255,255,.04); display:grid; place-items:center;">
+                {% if gi.media.kind == "image" %}
+                  <img src="{{ gi.media.file.url }}" alt="" style="width:100%; height:100%; object-fit:cover;">
+                {% else %}
+                  <span class="dhelp">Video</span>
+                {% endif %}
+              </div>
+              <div class="ditem__main">
+                <div class="ditem__title">{{ gi.media.title|default:gi.media.original_filename|default:gi.media.file.name }}</div>
+                <div class="ditem__sub" style="word-break: break-all;">{{ gi.media.file.url }}</div>
+              </div>
+              <label style="display:flex; align-items:center; gap: 8px; color: var(--d-sub); font-size: 12px;">
+                <input type="checkbox" name="remove_ids" form="productGalleryRemoveForm" value="{{ gi.id }}">
+                Remove
+              </label>
+            </div>
+          {% empty %}
+            <div class="dmuted">No gallery images yet. Upload above.</div>
+          {% endfor %}
+        </div>
+      </form>
+
+      <form id="productGalleryUploadForm" method="post" action="{% url 'dashboard:product_gallery_upload' product.id %}" enctype="multipart/form-data" style="margin-top:14px;">
+        {% csrf_token %}
+        <div class="dpanel__sub" style="margin-bottom:8px;">Upload (featured + gallery)</div>
+        <div class="dgrid2">
+          <div class="drow2"><label class="dlabel">Featured image</label><input class="dinput" type="file" name="featured_upload"></div>
+          <div class="drow2"><label class="dlabel">Gallery images</label><input class="dinput" type="file" name="gallery_uploads" multiple></div>
+        </div>
+        <div class="dactions2">
+          <button class="dbtn dbtn--primary" type="submit">Upload</button>
+        </div>
+      </form>
+
+      <form id="productGalleryRemoveForm" method="post" action="{% url 'dashboard:product_gallery_remove' product.id %}" style="margin-top:10px;">
+        {% csrf_token %}
+        <div class="dactions2">
+          <button class="dbtn" type="submit">Remove selected</button>
+          <div class="dhelp">This removes images from the gallery (does not delete the underlying asset).</div>
+        </div>
+      </form>
+    </section>
+
     <section class="dpanel">
       <div class="dpanel__head">
         <div>
