@@ -1,5 +1,7 @@
+from django.utils.decorators import method_decorator
+from django.views.decorators.csrf import ensure_csrf_cookie
 from django.utils import timezone
-from rest_framework import generics
+from rest_framework import generics, permissions, status
 from rest_framework.response import Response
 from rest_framework.views import APIView
 
@@ -19,7 +21,17 @@ from apps.cms.models import (
   ThemeSetting,
 )
 
-from .serializers import ProductSerializer
+from apps.customers.cart_service import (
+  add_item,
+  clear as clear_cart,
+  get_or_create_cart_for_request,
+  remove_item,
+  set_coupon,
+  set_item_qty,
+)
+from apps.customers.order_service import create_order_from_cart, validate_shipping
+
+from .serializers import CartSerializer, OrderListSerializer, OrderSerializer, ProductSerializer
 
 
 def _active_homepage() -> Homepage | None:
@@ -197,3 +209,178 @@ class ProductListView(generics.ListAPIView):
 class ProductDetailView(generics.RetrieveAPIView):
   queryset = Product.objects.filter(is_active=True, is_published=True).select_related("category", "primary_media").prefetch_related("variants", "images__media")
   serializer_class = ProductSerializer
+
+
+@method_decorator(ensure_csrf_cookie, name="dispatch")
+class CsrfCookieView(APIView):
+  permission_classes = [permissions.AllowAny]
+
+  def get(self, request):
+    return Response({"detail": "ok"})
+
+
+class CartView(APIView):
+  permission_classes = [permissions.AllowAny]
+
+  def get(self, request):
+    cart = get_or_create_cart_for_request(request)
+    cart = (
+      cart.__class__.objects.filter(pk=cart.pk)
+      .prefetch_related("items__product__variants", "items__product__images__media")
+      .select_related("user")
+      .first()
+    )
+    return Response(CartSerializer(cart).data)
+
+
+class CartItemAddView(APIView):
+  permission_classes = [permissions.AllowAny]
+
+  def post(self, request):
+    cart = get_or_create_cart_for_request(request)
+    product_id = request.data.get("productId") or request.data.get("product_id")
+    variant_key = request.data.get("variantKey") or request.data.get("variant_sku") or ""
+    qty = request.data.get("qty") or 1
+    try:
+      product_id_int = int(product_id)
+    except Exception:
+      return Response({"detail": "product_not_found"}, status=status.HTTP_400_BAD_REQUEST)
+    try:
+      add_item(cart, product_id_int, str(variant_key), int(qty))
+    except ValueError as e:
+      return Response({"detail": str(e)}, status=status.HTTP_400_BAD_REQUEST)
+
+    cart.refresh_from_db()
+    cart = cart.__class__.objects.filter(pk=cart.pk).prefetch_related("items__product__variants", "items__product__images__media").first()
+    return Response(CartSerializer(cart).data, status=201)
+
+
+class CartItemQtyView(APIView):
+  permission_classes = [permissions.AllowAny]
+
+  def patch(self, request, item_id: int):
+    cart = get_or_create_cart_for_request(request)
+    qty = request.data.get("qty") or 1
+    try:
+      set_item_qty(cart, int(item_id), int(qty))
+    except Exception:
+      return Response({"detail": "invalid_item"}, status=status.HTTP_400_BAD_REQUEST)
+    cart.refresh_from_db()
+    cart = cart.__class__.objects.filter(pk=cart.pk).prefetch_related("items__product__variants", "items__product__images__media").first()
+    return Response(CartSerializer(cart).data)
+
+
+class CartItemDeleteView(APIView):
+  permission_classes = [permissions.AllowAny]
+
+  def delete(self, request, item_id: int):
+    cart = get_or_create_cart_for_request(request)
+    remove_item(cart, int(item_id))
+    cart.refresh_from_db()
+    cart = cart.__class__.objects.filter(pk=cart.pk).prefetch_related("items__product__variants", "items__product__images__media").first()
+    return Response(CartSerializer(cart).data)
+
+
+class CartClearView(APIView):
+  permission_classes = [permissions.AllowAny]
+
+  def post(self, request):
+    cart = get_or_create_cart_for_request(request)
+    clear_cart(cart)
+    cart.refresh_from_db()
+    cart = cart.__class__.objects.filter(pk=cart.pk).prefetch_related("items__product__variants", "items__product__images__media").first()
+    return Response(CartSerializer(cart).data)
+
+
+class CartCouponView(APIView):
+  permission_classes = [permissions.AllowAny]
+
+  def post(self, request):
+    cart = get_or_create_cart_for_request(request)
+    code = request.data.get("code") or ""
+    set_coupon(cart, str(code))
+    cart.refresh_from_db()
+    cart = cart.__class__.objects.filter(pk=cart.pk).prefetch_related("items__product__variants", "items__product__images__media").first()
+    return Response(CartSerializer(cart).data)
+
+
+class CheckoutShippingView(APIView):
+  permission_classes = [permissions.IsAuthenticated]
+
+  def get(self, request):
+    return Response({"shipping": request.session.get("checkout_shipping")})
+
+  def post(self, request):
+    try:
+      shipping = validate_shipping(request.data or {})
+    except ValueError as e:
+      payload = e.args[0]
+      if isinstance(payload, dict):
+        return Response({"errors": payload}, status=status.HTTP_400_BAD_REQUEST)
+      return Response({"detail": "invalid_shipping"}, status=status.HTTP_400_BAD_REQUEST)
+
+    request.session["checkout_shipping"] = {
+      "fullName": shipping.fullName,
+      "phone": shipping.phone,
+      "email": shipping.email,
+      "pincode": shipping.pincode,
+      "address1": shipping.address1,
+      "address2": shipping.address2,
+      "city": shipping.city,
+      "state": shipping.state,
+    }
+    request.session.modified = True
+    return Response({"ok": True})
+
+
+class CheckoutPlaceView(APIView):
+  permission_classes = [permissions.IsAuthenticated]
+
+  def post(self, request):
+    cart = get_or_create_cart_for_request(request)
+    shipping_raw = request.session.get("checkout_shipping") or None
+    if not shipping_raw:
+      return Response({"detail": "missing_shipping"}, status=status.HTTP_400_BAD_REQUEST)
+    try:
+      shipping = validate_shipping(shipping_raw)
+    except ValueError:
+      return Response({"detail": "invalid_shipping"}, status=status.HTTP_400_BAD_REQUEST)
+
+    method = str(request.data.get("method") or "upi").lower()
+    mark_paid = bool(request.data.get("markPaid") or False)
+    if method not in {"upi", "card", "cod"}:
+      return Response({"detail": "invalid_method"}, status=status.HTTP_400_BAD_REQUEST)
+
+    try:
+      order = create_order_from_cart(cart=cart, user=request.user, shipping=shipping, payment_method=method, mark_paid=mark_paid)
+    except ValueError as e:
+      return Response({"detail": str(e)}, status=status.HTTP_400_BAD_REQUEST)
+
+    # Clear shipping draft after successful placement.
+    if "checkout_shipping" in request.session:
+      del request.session["checkout_shipping"]
+      request.session.modified = True
+
+    return Response({"orderId": str(order.public_id)})
+
+
+class OrderListView(generics.ListAPIView):
+  permission_classes = [permissions.IsAuthenticated]
+  serializer_class = OrderListSerializer
+
+  def get_queryset(self):
+    return (
+      self.request.user.orders.all()
+      .prefetch_related("items")
+      .order_by("-created_at")
+    )
+
+
+class OrderDetailView(generics.RetrieveAPIView):
+  permission_classes = [permissions.IsAuthenticated]
+  serializer_class = OrderSerializer
+  lookup_field = "public_id"
+  lookup_url_kwarg = "order_id"
+
+  def get_queryset(self):
+    return self.request.user.orders.all().prefetch_related("items", "shipping_address")

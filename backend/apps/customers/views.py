@@ -10,11 +10,17 @@ from django.views.decorators.http import require_POST
 from django.views.generic import TemplateView, View
 
 from .forms import CustomerSignupForm
+from .cart_service import merge_session_cart_to_user
 
 
 class CustomerLoginView(LoginView):
   template_name = "public/login.html"
   redirect_authenticated_user = True
+
+  def form_valid(self, form):
+    resp = super().form_valid(form)
+    merge_session_cart_to_user(self.request)
+    return resp
 
   def get_success_url(self):
     return self.get_redirect_url() or reverse_lazy("customers:account")
